@@ -1,0 +1,46 @@
+name: Manual MEMORA Operations
+
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Operation to run
+        required: true
+        type: choice
+        options:
+          - build
+          - deploy
+          - qa-create
+          - qa-full
+
+permissions:
+  contents: write
+  issues: read
+
+jobs:
+  build:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.operation == 'build') ||
+      (github.event_name == 'issues' && github.event.issue.title == '[MEMORA ACTION] build')
+    uses: ./.github/workflows/build.yml
+
+  deploy:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.operation == 'deploy') ||
+      (github.event_name == 'issues' && github.event.issue.title == '[MEMORA ACTION] deploy')
+    uses: ./.github/workflows/deploy-cloudflare.yml
+    secrets: inherit
+
+  qa-create:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.operation == 'qa-create') ||
+      (github.event_name == 'issues' && github.event.issue.title == '[MEMORA ACTION] qa-create')
+    uses: ./.github/workflows/qa-create-screen.yml
+
+  qa-full:
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.operation == 'qa-full') ||
+      (github.event_name == 'issues' && github.event.issue.title == '[MEMORA ACTION] qa-full')
+    uses: ./.github/workflows/qa-screenshots.yml

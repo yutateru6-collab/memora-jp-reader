@@ -1,0 +1,90 @@
+name: QA Create Screen
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: write
+
+jobs:
+  create-screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Verify production build
+        run: npm run build
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.62.1
+          npx playwright install --with-deps chromium
+
+      - name: Start Vite app
+        run: |
+          npm run dev > /tmp/memora-create-vite.log 2>&1 &
+          echo $! > /tmp/memora-create-vite.pid
+
+      - name: Wait for app
+        run: |
+          for i in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:3000 > /dev/null; then
+              echo "App is ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/memora-create-vite.log || true
+          exit 1
+
+      - name: Capture and verify creation screen
+        id: create_qa
+        continue-on-error: true
+        run: node tools/capture-create-screen.mjs
+        env:
+          APP_URL: http://127.0.0.1:3000
+          QA_REPOSITORY: ${{ github.repository }}
+          QA_COMMIT_SHA: ${{ github.sha }}
+          QA_RUN_ID: ${{ github.run_id }}
+
+      - name: Publish latest creation-screen evidence
+        if: always()
+        run: |
+          if [ ! -d qa-create-artifacts ]; then
+            echo "qa-create-artifacts is missing"
+            exit 1
+          fi
+
+          mkdir -p /tmp/qa-create-latest
+          cp -R qa-create-artifacts/. /tmp/qa-create-latest/
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [ -f /tmp/memora-create-vite.pid ]; then
+            kill "$(cat /tmp/memora-create-vite.pid)" >/dev/null 2>&1 || true
+          fi
+
+          git checkout --orphan qa-create-latest-temp
+          git rm -rf . >/dev/null 2>&1 || true
+          git clean -fdx >/dev/null 2>&1 || true
+          cp -R /tmp/qa-create-latest/. .
+          git add report.json screenshots/
+          git commit -m "Update creation-screen QA evidence"
+          git push --force origin HEAD:qa-create-latest
+
+      - name: Fail when focused QA failed
+        if: steps.create_qa.outcome != 'success'
+        run: exit 1

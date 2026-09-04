@@ -1,0 +1,365 @@
+html, body, #root {
+  min-height: 100%;
+}
+
+html {
+  background: #0f172a;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  -webkit-text-size-adjust: 100%;
+}
+
+button, input, textarea, select {
+  font: inherit;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/*
+ * MEMORA soft-pop skin
+ *
+ * The app currently ships with the dark theme selected by default, and a number
+ * of screens intentionally rely on dark-theme contrast (text-white,
+ * border-white/10, bg-black/20, etc.). Rather than changing component logic or
+ * theme semantics, these rules only restyle that existing dark theme. Forest,
+ * Ocean and Light remain untouched.
+ */
+body.bg-slate-900,
+body.bg-slate-900 .bg-slate-900 {
+  background-color: #172554 !important;
+  background-image:
+    radial-gradient(circle at 12% 0%, rgba(56, 189, 248, 0.22), transparent 34%),
+    radial-gradient(circle at 88% 8%, rgba(168, 85, 247, 0.20), transparent 32%),
+    radial-gradient(circle at 50% 100%, rgba(236, 72, 153, 0.10), transparent 36%),
+    linear-gradient(145deg, #0f172a 0%, #172554 48%, #1e1b4b 100%) !important;
+}
+
+/* Header / floating panels: keep strong contrast but remove the flat-black feel. */
+body.bg-slate-900 [class~="bg-slate-900/90"] {
+  background: rgba(15, 23, 42, 0.76) !important;
+  border-color: rgba(165, 180, 252, 0.18) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(125%);
+  backdrop-filter: blur(18px) saturate(125%);
+  box-shadow: 0 10px 35px rgba(2, 6, 23, 0.22);
+}
+
+/* Main cards / modal surfaces: glassy navy with a faint violet tint. */
+body.bg-slate-900 .bg-slate-800 {
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.88), rgba(49, 46, 129, 0.50)) !important;
+  border-color: rgba(125, 211, 252, 0.14) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  backdrop-filter: blur(16px) saturate(120%);
+  box-shadow: 0 18px 48px rgba(2, 6, 23, 0.22), 0 6px 22px rgba(99, 102, 241, 0.10);
+}
+
+/* Secondary controls become translucent chips instead of heavy grey blocks. */
+body.bg-slate-900 .bg-slate-700 {
+  background-color: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid rgba(191, 219, 254, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+body.bg-slate-900 .bg-slate-700:hover {
+  background-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+body.bg-slate-900 .bg-slate-600 {
+  background: linear-gradient(135deg, rgba(71, 85, 105, 0.86), rgba(99, 102, 241, 0.42)) !important;
+  border: 1px solid rgba(199, 210, 254, 0.14);
+}
+
+body.bg-slate-900 .bg-slate-600:hover {
+  background: linear-gradient(135deg, rgba(100, 116, 139, 0.90), rgba(129, 140, 248, 0.50)) !important;
+}
+
+/* Main action color: sky -> indigo -> violet for a restrained pop feel. */
+body.bg-slate-900 .bg-sky-600 {
+  background: linear-gradient(135deg, #0ea5e9 0%, #4f46e5 58%, #8b5cf6 100%) !important;
+  box-shadow: 0 8px 22px rgba(56, 189, 248, 0.18), 0 4px 14px rgba(139, 92, 246, 0.16);
+}
+
+body.bg-slate-900 .bg-sky-600:hover {
+  background: linear-gradient(135deg, #38bdf8 0%, #6366f1 56%, #a78bfa 100%) !important;
+}
+
+/* Active-reading highlight stays calm enough for long sessions. */
+body.bg-slate-900 [class~="bg-sky-900/30"] {
+  background: linear-gradient(90deg, rgba(14, 165, 233, 0.16), rgba(99, 102, 241, 0.18), rgba(168, 85, 247, 0.12)) !important;
+}
+
+body.bg-slate-900 .border-slate-700 {
+  border-color: rgba(165, 180, 252, 0.22) !important;
+}
+
+body.bg-slate-900 .text-slate-200 {
+  color: #f1f5f9 !important;
+}
+
+body.bg-slate-900 .text-slate-400 {
+  color: #cbd5e1 !important;
+}
+
+/* Give large cards a softer, more finished depth without changing layout. */
+body.bg-slate-900 .rounded-2xl.shadow-lg {
+  box-shadow: 0 20px 54px rgba(2, 6, 23, 0.24), 0 8px 26px rgba(79, 70, 229, 0.12) !important;
+}
+
+body.bg-slate-900 .rounded-2xl.shadow-2xl {
+  box-shadow: 0 26px 70px rgba(2, 6, 23, 0.28), 0 10px 34px rgba(56, 189, 248, 0.10) !important;
+}
+
+/* Inputs keep the same behavior, but focus reads more clearly on mobile. */
+body.bg-slate-900 input,
+body.bg-slate-900 textarea,
+body.bg-slate-900 select {
+  transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+body.bg-slate-900 input:focus,
+body.bg-slate-900 textarea:focus,
+body.bg-slate-900 select:focus {
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+}
+
+/* First-run screen: keep the app focused on generated learning content only. */
+section[aria-label="MEMORAをはじめる"] .mt-5 > button + button {
+  display: none !important;
+}
+
+/* Temporarily simplify the first-run and long-reading creation screens. */
+section[aria-label="MEMORAをはじめる"] .relative.z-10 > div:first-child {
+  display: none !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(3) > div:nth-child(3),
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(3) > div:nth-child(4),
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) > div > div:nth-child(1),
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(5) {
+  display: none !important;
+}
+
+@media (min-width: 1024px) {
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(3) > div:nth-child(1),
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(3) > div:nth-child(2) {
+    grid-column: span 4 / span 4 !important;
+  }
+}
+
+@media (min-width: 640px) {
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) > div > div:nth-child(2) {
+    grid-column: span 5 / span 5 !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) > div > div:nth-child(3) {
+    grid-column: span 6 / span 6 !important;
+  }
+}
+
+/*
+ * Prompt library: mobile-first visual hierarchy.
+ * Scope the rules to the prompt-library screen via its unique mascot image so
+ * the rest of the app keeps its existing layout and theme behavior.
+ */
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"]) > div > div > div:last-child > :first-child {
+  overflow: hidden;
+}
+
+body.bg-slate-900 main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) {
+  background-color: rgba(15, 23, 42, 0.34) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) {
+  box-shadow: none !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > div:nth-child(3) {
+  gap: 0.65rem !important;
+}
+
+@media (max-width: 640px) {
+  body.bg-slate-900,
+  body.bg-slate-900 .bg-slate-900 {
+    background-image:
+      radial-gradient(circle at 8% 0%, rgba(56, 189, 248, 0.18), transparent 30%),
+      radial-gradient(circle at 94% 12%, rgba(168, 85, 247, 0.16), transparent 30%),
+      linear-gradient(155deg, #0f172a 0%, #172554 52%, #1e1b4b 100%) !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"]) {
+    padding: 0.75rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:last-child > :first-child > div:nth-child(2) > div > div {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > * + * {
+    margin-top: 0.8rem !important;
+  }
+
+  /* Four compact generation controls become a readable 2 x 2 block. */
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(3) {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.7rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(3) > div {
+    min-width: 0;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(3) select {
+    min-height: 2.8rem;
+  }
+
+  /* Persona cards: keep the name readable, but put role and trait side-by-side. */
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) {
+    padding: 0.7rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) > div {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.55rem !important;
+    position: relative;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) > div > div:nth-child(1) {
+    grid-column: 1 / -1;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) > div > div:nth-child(4) {
+    position: absolute;
+    right: -0.15rem;
+    top: -0.2rem;
+    padding: 0 !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) select,
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) input {
+    min-width: 0;
+    min-height: 2.65rem;
+  }
+
+  /* The explanation slider has four actual states, so show four visual anchors. */
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(5) > div > div:nth-child(2) {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.2rem;
+    align-items: start;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(5) > div > div:nth-child(2) span {
+    font-size: 0 !important;
+    line-height: 1.2;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(5) > div > div:nth-child(2) span::after {
+    font-size: 0.68rem;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(5) > div > div:nth-child(2) span:nth-child(1)::after {
+    content: "反応重視";
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(5) > div > div:nth-child(2) span:nth-child(2)::after {
+    content: "軽め";
+    display: block;
+    text-align: center;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(5) > div > div:nth-child(2) span:nth-child(3)::after {
+    content: "標準";
+    display: block;
+    text-align: center;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(5) > div > div:nth-child(2)::after {
+    content: "文法重視";
+    font-size: 0.68rem;
+    line-height: 1.2;
+    text-align: right;
+  }
+
+  /* Give the creation flow a single obvious primary action on narrow screens. */
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0.55rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > * {
+    width: 100% !important;
+    min-height: 3rem;
+    border-radius: 0.75rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > :nth-child(1) {
+    order: 3;
+    opacity: 0.88;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > :nth-child(2) {
+    order: 1;
+    min-height: 3.35rem;
+    font-size: 0.95rem;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > :nth-child(3) {
+    order: 2;
+    box-shadow: none !important;
+    filter: saturate(0.72);
+  }
+}

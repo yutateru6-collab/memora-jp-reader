@@ -1,0 +1,630 @@
+/* Star + dinosaur visual system for the first-run and prompt creation flows.
+ * This layer intentionally does not change prompt state, generation logic, or JSON import behavior.
+ */
+
+body.bg-slate-900 {
+  --sd-page-1: #07122f;
+  --sd-page-2: #191746;
+  --sd-page-3: #26184f;
+  --sd-card: rgba(17, 27, 67, 0.9);
+  --sd-card-strong: rgba(26, 30, 79, 0.94);
+  --sd-field: rgba(255, 255, 255, 0.075);
+  --sd-border: rgba(196, 181, 253, 0.28);
+  --sd-border-strong: rgba(216, 180, 254, 0.46);
+  --sd-star: #fde68a;
+  --sd-star-soft: rgba(253, 230, 138, 0.62);
+  --sd-violet: #a78bfa;
+  --sd-pink: #f0abfc;
+  --sd-sky: #67e8f9;
+  --sd-muted: #b9c4df;
+}
+
+body.bg-green-900 {
+  --sd-page-1: #07261f;
+  --sd-page-2: #103c36;
+  --sd-page-3: #1f3d48;
+  --sd-card: rgba(8, 44, 39, 0.91);
+  --sd-card-strong: rgba(11, 55, 49, 0.94);
+  --sd-field: rgba(255, 255, 255, 0.08);
+  --sd-border: rgba(110, 231, 183, 0.28);
+  --sd-border-strong: rgba(167, 243, 208, 0.46);
+  --sd-star: #fde68a;
+  --sd-star-soft: rgba(253, 230, 138, 0.55);
+  --sd-violet: #6ee7b7;
+  --sd-pink: #a7f3d0;
+  --sd-sky: #67e8f9;
+  --sd-muted: #c8ded9;
+}
+
+body.bg-cyan-950 {
+  --sd-page-1: #06203a;
+  --sd-page-2: #073b57;
+  --sd-page-3: #163b66;
+  --sd-card: rgba(5, 39, 66, 0.91);
+  --sd-card-strong: rgba(7, 51, 85, 0.94);
+  --sd-field: rgba(255, 255, 255, 0.08);
+  --sd-border: rgba(103, 232, 249, 0.3);
+  --sd-border-strong: rgba(165, 243, 252, 0.46);
+  --sd-star: #fde68a;
+  --sd-star-soft: rgba(253, 230, 138, 0.55);
+  --sd-violet: #67e8f9;
+  --sd-pink: #a5f3fc;
+  --sd-sky: #7dd3fc;
+  --sd-muted: #c4dde9;
+}
+
+body.bg-gray-50 {
+  --sd-page-1: #eef2ff;
+  --sd-page-2: #f5f3ff;
+  --sd-page-3: #fdf4ff;
+  --sd-card: rgba(255, 255, 255, 0.9);
+  --sd-card-strong: rgba(255, 255, 255, 0.96);
+  --sd-field: rgba(79, 70, 229, 0.05);
+  --sd-border: rgba(99, 102, 241, 0.18);
+  --sd-border-strong: rgba(139, 92, 246, 0.34);
+  --sd-star: #d97706;
+  --sd-star-soft: rgba(217, 119, 6, 0.35);
+  --sd-violet: #7c3aed;
+  --sd-pink: #c026d3;
+  --sd-sky: #0284c7;
+  --sd-muted: #64748b;
+}
+
+@keyframes sd-star-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.9); }
+  50% { opacity: 0.95; transform: scale(1.08); }
+}
+
+@keyframes sd-dino-float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-5px) rotate(1deg); }
+}
+
+section[aria-label="MEMORAをはじめる"] {
+  isolation: isolate;
+  border-color: var(--sd-border-strong) !important;
+  background:
+    radial-gradient(circle at 12% 15%, rgba(125, 211, 252, 0.14), transparent 24%),
+    radial-gradient(circle at 86% 18%, rgba(192, 132, 252, 0.18), transparent 26%),
+    radial-gradient(circle at 24% 78%, rgba(253, 230, 138, 0.08), transparent 22%),
+    linear-gradient(155deg, var(--sd-page-1), var(--sd-page-2) 54%, var(--sd-page-3)) !important;
+  box-shadow: 0 26px 70px rgba(2, 6, 23, 0.24), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+}
+
+section[aria-label="MEMORAをはじめる"]::before,
+section[aria-label="MEMORAをはじめる"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+section[aria-label="MEMORAをはじめる"]::before {
+  background-image:
+    radial-gradient(circle, var(--sd-star) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(255,255,255,0.9) 0 1px, transparent 1.7px),
+    radial-gradient(circle, var(--sd-star-soft) 0 1.5px, transparent 2.2px);
+  background-size: 82px 82px, 121px 121px, 157px 157px;
+  background-position: 7px 14px, 46px 12px, 73px 64px;
+  opacity: 0.55;
+}
+
+section[aria-label="MEMORAをはじめる"]::after {
+  background:
+    radial-gradient(ellipse at 50% 105%, rgba(49, 46, 129, 0.34), transparent 55%),
+    linear-gradient(to top, rgba(15, 23, 42, 0.18), transparent 35%);
+}
+
+section[aria-label="MEMORAをはじめる"] .relative.z-10 {
+  z-index: 2;
+}
+
+section[aria-label="MEMORAをはじめる"] img[src*="02_緑_本を読むトリケラトプス.png"] {
+  width: 10.5rem !important;
+  max-height: 10.5rem !important;
+  margin-bottom: 0.25rem !important;
+  filter: drop-shadow(0 12px 24px rgba(99, 102, 241, 0.28));
+}
+
+section[aria-label="MEMORAをはじめる"] h2 {
+  text-shadow: 0 2px 18px rgba(167, 139, 250, 0.18);
+}
+
+section[aria-label="MEMORAをはじめる"] .mt-5 > button:first-child {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(216, 180, 254, 0.4);
+  background: linear-gradient(100deg, #7c3aed 0%, #4f46e5 52%, #0ea5e9 100%) !important;
+  box-shadow: 0 14px 34px rgba(99, 102, 241, 0.28), inset 0 1px 0 rgba(255,255,255,0.22) !important;
+}
+
+section[aria-label="MEMORAをはじめる"] .mt-5 > button:first-child::after {
+  content: "✦";
+  position: absolute;
+  right: 1.15rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--sd-star);
+  font-size: 1rem;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"]) {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 14% 4%, rgba(14, 165, 233, 0.13), transparent 21%),
+    radial-gradient(circle at 88% 10%, rgba(168, 85, 247, 0.16), transparent 25%),
+    linear-gradient(160deg, var(--sd-page-1), var(--sd-page-2) 58%, var(--sd-page-3)) !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, var(--sd-star) 0 1px, transparent 1.7px),
+    radial-gradient(circle, rgba(255,255,255,0.85) 0 1px, transparent 1.6px),
+    radial-gradient(circle, var(--sd-star-soft) 0 1.4px, transparent 2px);
+  background-size: 88px 88px, 137px 137px, 181px 181px;
+  background-position: 12px 18px, 61px 3px, 97px 83px;
+  opacity: 0.48;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"]) > div {
+  position: relative;
+  z-index: 1;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child {
+  position: relative;
+  min-height: 184px;
+  margin-bottom: 0 !important;
+  padding: 1.45rem 10.5rem 2rem 1.45rem !important;
+  overflow: hidden;
+  border: 1px solid var(--sd-border-strong) !important;
+  border-radius: 1.75rem 1.75rem 0.9rem 0.9rem;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(253, 230, 138, 0.1), transparent 20%),
+    radial-gradient(circle at 88% 66%, rgba(167, 139, 250, 0.2), transparent 34%),
+    linear-gradient(135deg, rgba(8, 18, 52, 0.92), rgba(45, 30, 91, 0.88)) !important;
+  box-shadow: 0 24px 56px rgba(2, 6, 23, 0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child::before {
+  content: "✦   ·   ✧   ·   ✦";
+  position: absolute;
+  right: 1.2rem;
+  top: 0.85rem;
+  color: var(--sd-star);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  opacity: 0.8;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child::after {
+  content: "";
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  bottom: -2.3rem;
+  height: 5rem;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(79, 70, 229, 0.32), transparent 68%);
+  pointer-events: none;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child > div {
+  position: relative;
+  z-index: 2;
+  max-width: 30rem;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child h2 {
+  margin: 0;
+  font-size: 0 !important;
+  line-height: 1;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child h2::before {
+  content: "✦";
+  margin-right: 0.45rem;
+  color: var(--sd-star);
+  font-size: 1.45rem;
+  filter: drop-shadow(0 0 12px rgba(253, 230, 138, 0.4));
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child h2::after {
+  content: "教材をつくる";
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child p {
+  margin-top: 0.8rem !important;
+  max-width: 29rem;
+  font-size: 0 !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child p::after {
+  content: "好きなテーマの英語長文をつくって、恐竜と一緒に学ぼう。";
+  color: var(--sd-muted);
+  font-size: 0.92rem;
+  line-height: 1.8;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child > img {
+  position: absolute;
+  z-index: 3;
+  right: 0.75rem;
+  bottom: -0.55rem;
+  width: 10.5rem !important;
+  height: 10.5rem !important;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 28px rgba(99, 102, 241, 0.28));
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child {
+  position: relative;
+  z-index: 4;
+  margin-top: -0.75rem;
+  border: 1px solid var(--sd-border-strong) !important;
+  border-radius: 1.5rem !important;
+  background: var(--sd-card) !important;
+  box-shadow: 0 26px 68px rgba(2, 6, 23, 0.24), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+  backdrop-filter: blur(18px) saturate(118%);
+  -webkit-backdrop-filter: blur(18px) saturate(118%);
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > button {
+  padding: 1rem 1.15rem !important;
+  background: linear-gradient(90deg, rgba(124, 58, 237, 0.08), rgba(14, 165, 233, 0.04));
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > button span:first-child {
+  font-size: 0 !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > button span:first-child::after {
+  content: "★";
+  color: var(--sd-star);
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 9px rgba(253, 230, 138, 0.35));
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 label {
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(1) label::before {
+  content: "★";
+  color: var(--sd-star);
+  margin-right: 0.4rem;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(2) label::before {
+  content: "✦";
+  color: var(--sd-pink);
+  margin-right: 0.4rem;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 input,
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 select {
+  border-color: var(--sd-border) !important;
+  background-color: var(--sd-field) !important;
+  min-height: 3.2rem;
+  border-radius: 0.95rem !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 input:focus,
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 select:focus {
+  border-color: rgba(216, 180, 254, 0.65) !important;
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.12), 0 0 22px rgba(167, 139, 250, 0.08) !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(3) > div:nth-child(1),
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(3) > div:nth-child(2) {
+  padding: 0.8rem;
+  border: 1px solid var(--sd-border);
+  border-radius: 1.1rem;
+  background: linear-gradient(145deg, rgba(124, 58, 237, 0.08), rgba(255,255,255,0.025));
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(3) > div:nth-child(2) {
+  background: linear-gradient(145deg, rgba(14, 165, 233, 0.07), rgba(255,255,255,0.025));
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(4) {
+  position: relative;
+  overflow: hidden;
+  margin-top: 1rem !important;
+  padding: 1rem !important;
+  border: 1px solid var(--sd-border) !important;
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(253, 230, 138, 0.07), transparent 22%),
+    linear-gradient(145deg, rgba(93, 46, 163, 0.13), rgba(15, 23, 42, 0.12));
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(4)::after {
+  content: "✦   ·   ✧";
+  position: absolute;
+  right: 1rem;
+  top: 0.85rem;
+  color: var(--sd-star-soft);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  opacity: 0.75;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(4) > div:first-child > label {
+  font-size: 0 !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(4) > div:first-child > label::before {
+  content: "★";
+  margin-right: 0.4rem;
+  color: var(--sd-star);
+  font-size: 1rem;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(4) > div:first-child > label::after {
+  content: "解説キャラ";
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) {
+  position: relative;
+  min-height: 6.8rem;
+  padding: 0.8rem 0.8rem 0.8rem 5.8rem !important;
+  border-color: rgba(196, 181, 253, 0.22) !important;
+  background: rgba(10, 18, 50, 0.3) !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  width: 4rem;
+  height: 4rem;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  border: 1px solid rgba(240, 171, 252, 0.45);
+  background-color: rgba(76, 29, 149, 0.2);
+  background-image: url('/mascots/06_紫_ノートを書くステゴサウルス.png');
+  background-size: 4.2rem;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 24px rgba(217, 70, 239, 0.16), inset 0 0 18px rgba(255,255,255,0.03);
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 {
+  margin-top: 1rem !important;
+  padding-top: 1rem !important;
+  gap: 0.65rem !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > * {
+  position: relative;
+  overflow: hidden;
+  min-height: 3.65rem !important;
+  border-radius: 1rem !important;
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.15;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > :nth-child(2) {
+  font-size: 0 !important;
+  background: linear-gradient(96deg, #8b5cf6 0%, #6366f1 55%, #0ea5e9 100%) !important;
+  box-shadow: 0 14px 34px rgba(99, 102, 241, 0.28), inset 0 1px 0 rgba(255,255,255,0.18) !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > :nth-child(2)::before {
+  content: "✦  AI Studioで長文を作る";
+  color: #fff;
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > :nth-child(2)::after {
+  content: "プロンプトをコピーしてAI Studioを開きます";
+  margin-top: 0.25rem;
+  color: rgba(255,255,255,0.72);
+  font-size: 0.66rem;
+  font-weight: 500;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > :nth-child(3) {
+  font-size: 0 !important;
+  background: linear-gradient(96deg, #047857, #0891b2) !important;
+  box-shadow: 0 10px 26px rgba(5, 150, 105, 0.18) !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > :nth-child(3)::before {
+  content: "生成結果を取り込む";
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > :nth-child(3)::after {
+  content: "AI Studioで作った長文を貼り付けます";
+  margin-top: 0.23rem;
+  color: rgba(255,255,255,0.72);
+  font-size: 0.65rem;
+  font-weight: 500;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > :nth-child(1) {
+  font-size: 0 !important;
+  background: rgba(255,255,255,0.065) !important;
+  color: inherit !important;
+  box-shadow: none !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > :nth-child(1)::before {
+  content: "プロンプトだけコピー";
+  font-size: 0.88rem;
+  font-weight: 750;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :nth-child(2) {
+  border-color: rgba(148, 163, 184, 0.2) !important;
+  opacity: 0.9;
+}
+
+@media (max-width: 640px) {
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"]) {
+    padding: 0.65rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:first-child {
+    min-height: 166px;
+    padding: 1.15rem 8.4rem 1.55rem 1.1rem !important;
+    border-radius: 1.45rem 1.45rem 0.75rem 0.75rem;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:first-child h2::before {
+    font-size: 1.05rem;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:first-child h2::after {
+    font-size: 1.65rem;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:first-child p::after {
+    font-size: 0.78rem;
+    line-height: 1.7;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:first-child > img {
+    right: 0.35rem;
+    bottom: -0.2rem;
+    width: 8.5rem !important;
+    height: 8.5rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:last-child > :first-child {
+    margin-top: -0.55rem;
+    border-radius: 1.25rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:last-child > :first-child > button {
+    padding: 0.85rem 0.95rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) {
+    padding: 0.8rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) {
+    min-height: 7rem;
+    padding-left: 5.25rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child)::before {
+    left: 0.6rem;
+    width: 3.8rem;
+    height: 3.8rem;
+    background-size: 4rem;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) > div {
+    gap: 0.45rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > * {
+    min-height: 3.8rem !important;
+  }
+
+  section[aria-label="MEMORAをはじめる"] img[src*="02_緑_本を読むトリケラトプス.png"] {
+    width: 9rem !important;
+    max-height: 9rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:first-child > img,
+  section[aria-label="MEMORAをはじめる"] img[src*="02_緑_本を読むトリケラトプス.png"] {
+    animation: sd-dino-float 4.8s ease-in-out infinite;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:first-child::before {
+    animation: sd-star-pulse 3.6s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"]) *,
+  section[aria-label="MEMORAをはじめる"] * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

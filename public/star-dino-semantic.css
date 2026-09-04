@@ -1,0 +1,105 @@
+/* Keep the star/dinosaur hero decorative without replacing semantic copy via generated content. */
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child h2 {
+  font-size: 1.35rem !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.015em;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child h2::before {
+  content: "✦";
+  margin-right: 0.45rem;
+  color: var(--sd-star);
+  font-size: 1rem;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child h2::after {
+  content: none !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child p {
+  margin-top: 0.65rem !important;
+  max-width: 29rem;
+  font-size: 0.88rem !important;
+  line-height: 1.75;
+  color: var(--sd-muted) !important;
+}
+
+main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child p::after {
+  content: none !important;
+}
+
+/* The light theme keeps the same star/dino language but uses a dawn-like surface,
+ * so the app's existing dark text tokens remain readable. */
+body.bg-gray-50 main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:first-child {
+  background:
+    radial-gradient(circle at 80% 18%, rgba(217, 119, 6, 0.08), transparent 22%),
+    radial-gradient(circle at 88% 68%, rgba(139, 92, 246, 0.11), transparent 34%),
+    linear-gradient(135deg, rgba(255,255,255,0.98), rgba(245,243,255,0.94)) !important;
+  box-shadow: 0 22px 52px rgba(99, 102, 241, 0.10), inset 0 1px 0 rgba(255,255,255,0.86) !important;
+}
+
+body.bg-gray-50 main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(4) {
+  background:
+    radial-gradient(circle at 88% 18%, rgba(217, 119, 6, 0.05), transparent 22%),
+    linear-gradient(145deg, rgba(124, 58, 237, 0.055), rgba(255,255,255,0.82)) !important;
+}
+
+body.bg-gray-50 main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) {
+  background: rgba(99, 102, 241, 0.035) !important;
+}
+
+body.bg-gray-50 main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+  > div > div > div:last-child > :first-child > div:nth-child(2) > div > div > .flex.items-center.gap-2 > :nth-child(1)::before {
+  color: #374151;
+}
+
+@media (max-width: 640px) {
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:first-child h2 {
+    font-size: 1.18rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    > div > div > div:first-child p {
+    font-size: 0.76rem !important;
+    line-height: 1.65;
+  }
+
+  /* On narrow phones the mascot becomes a small companion header instead of
+   * stealing half the width from the role/trait controls. */
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child) {
+    min-height: 8.2rem !important;
+    padding: 3.9rem 0.7rem 0.75rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child)::before {
+    left: 0.7rem !important;
+    top: 0.55rem !important;
+    width: 2.85rem !important;
+    height: 2.85rem !important;
+    transform: none !important;
+    background-size: 3rem !important;
+  }
+
+  main:has(img[src*="06_紫_ノートを書くステゴサウルス.png"])
+    .space-y-4.my-4 > div:nth-child(4) > div:not(:first-child)::after {
+    content: "いっしょに読むよ  ✦";
+    position: absolute;
+    left: 4rem;
+    top: 1.25rem;
+    color: var(--sd-muted);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+}
