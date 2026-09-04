@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: qa-screenshots-${{ github.ref }}
@@ -98,51 +98,11 @@ jobs:
         env:
           APP_URL: http://127.0.0.1:3000
 
-      - name: Publish latest QA evidence
+      - name: Retain QA evidence briefly
         if: always()
-        env:
-          QA_JOB_STATUS: ${{ job.status }}
-        run: |
-          mkdir -p /tmp/qa-latest/screenshots
-          if [ -f qa-artifacts/report.json ]; then
-            cp qa-artifacts/report.json /tmp/qa-latest/report.json
-          fi
-          if [ -d qa-artifacts/screenshots ]; then
-            cp -R qa-artifacts/screenshots/. /tmp/qa-latest/screenshots/
-          fi
-
-          SCREENSHOT_COUNT="$(find /tmp/qa-latest/screenshots -type f 2>/dev/null | wc -l | tr -d ' ')"
-          QA_STATUS="failure"
-          if [ -f /tmp/qa-latest/report.json ]; then
-            QA_STATUS="$(node -e "const fs=require('fs');const r=JSON.parse(fs.readFileSync('/tmp/qa-latest/report.json','utf8'));process.stdout.write(r.status||'failure')")"
-          fi
-
-          cat > /tmp/qa-latest/latest.json <<EOF
-          {
-            "repository": "${GITHUB_REPOSITORY}",
-            "workflow": "QA Screenshots",
-            "run_id": "${GITHUB_RUN_ID}",
-            "run_number": "${GITHUB_RUN_NUMBER}",
-            "commit_sha": "${GITHUB_SHA}",
-            "job_status": "${QA_JOB_STATUS}",
-            "qa_status": "${QA_STATUS}",
-            "screenshot_count": ${SCREENSHOT_COUNT},
-            "generated_at_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          }
-          EOF
-
-          if [ -f /tmp/memora-vite.pid ]; then
-            kill "$(cat /tmp/memora-vite.pid)" >/dev/null 2>&1 || true
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout --orphan qa-latest-temp
-          git rm -rf . >/dev/null 2>&1 || true
-          git clean -fdx >/dev/null 2>&1 || true
-          cp -R /tmp/qa-latest/. .
-          git add latest.json
-          if [ -f report.json ]; then git add report.json; fi
-          if [ -d screenshots ]; then git add screenshots/; fi
-          git commit -m "Update latest QA evidence"
-          git push --force origin HEAD:qa-latest
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-evidence-${{ github.run_id }}
+          path: qa-artifacts/
+          if-no-files-found: warn
+          retention-days: 1
