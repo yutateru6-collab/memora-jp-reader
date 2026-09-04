@@ -1,0 +1,73 @@
+name: QA Create Screen
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  create-screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Verify production build
+        run: npm run build
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.62.1
+          npx playwright install --with-deps chromium
+
+      - name: Start Vite app
+        run: |
+          npm run dev > /tmp/memora-create-vite.log 2>&1 &
+          echo $! > /tmp/memora-create-vite.pid
+
+      - name: Wait for app
+        run: |
+          for i in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:3000 > /dev/null; then
+              echo "App is ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/memora-create-vite.log || true
+          exit 1
+
+      - name: Capture and verify creation screen
+        id: create_qa
+        continue-on-error: true
+        run: node tools/capture-create-screen.mjs
+        env:
+          APP_URL: http://127.0.0.1:3000
+          QA_REPOSITORY: ${{ github.repository }}
+          QA_COMMIT_SHA: ${{ github.sha }}
+          QA_RUN_ID: ${{ github.run_id }}
+
+      - name: Retain creation-screen evidence briefly
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-create-evidence-${{ github.run_id }}
+          path: qa-create-artifacts/
+          if-no-files-found: warn
+          retention-days: 1
+
+      - name: Fail when focused QA failed
+        if: steps.create_qa.outcome != 'success'
+        run: exit 1

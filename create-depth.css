@@ -1,0 +1,71 @@
+.create-home__choice-card--knowledge {
+  background: linear-gradient(145deg, rgba(82, 47, 104, 0.92), rgba(18, 39, 78, 0.9));
+}
+
+@media (max-width: 699px) {
+  .create-home__choice-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 5px;
+  }
+
+  .create-home__choice-card {
+    padding: 5px 4px 4px;
+    border-radius: 12px;
+  }
+
+  .create-home__choice-card .create-home__choice-title {
+    width: 100%;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 3px;
+    font-size: 9px;
+    line-height: 1.15;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  .create-home__choice-card .create-home__choice-title > span:first-child,
+  .create-home__choice-card .create-home__select-wrap > svg,
+  .create-home__choice-card > small {
+    display: none;
+  }
+
+  .create-home__choice-card select {
+    min-height: 40px;
+    padding: 6px 18px 6px 5px;
+    border-radius: 9px;
+    font-size: 16px;
+    line-height: 1.1;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background-position: calc(100% - 10px) 17px, calc(100% - 6px) 17px;
+  }
+}
+
+@media (max-width: 360px) {
+  .create-home__choice-grid {
+    gap: 4px;
+  }
+
+  .create-home__choice-card {
+    padding: 4px 3px 3px;
+  }
+
+  .create-home__choice-card .create-home__choice-title {
+    font-size: 8.5px;
+  }
+
+  .create-home__choice-card select {
+    padding-right: 15px;
+    padding-left: 4px;
+    background-position: calc(100% - 8px) 17px, calc(100% - 4px) 17px;
+  }
+}
+
+@media (min-width: 700px) {
+  .create-home__choice-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
