@@ -71,6 +71,18 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
 
   useEffect(() => { void reload(); }, [reload]);
 
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem('memora-jp-open-import') === '1') {
+        sessionStorage.removeItem('memora-jp-open-import');
+        setImportTab('json-paste');
+        setIsImportOpen(true);
+      }
+    } catch {
+      // sessionStorageが利用できない環境では通常のライブラリ表示を続ける。
+    }
+  }, []);
+
   const resetImport = useCallback(() => {
     setJsonInput('');
     setJsonFileName('');
@@ -213,13 +225,13 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
     <main className="jp-library" data-testid="jp-library">
       <header className="jp-library-header">
         <div className="jp-library-header__top">
-          <button type="button" className="jp-button jp-button--quiet" onClick={onBack}>← 英語MEMORA</button>
+          <button type="button" className="jp-button jp-button--quiet" onClick={onBack}>← 作成トップ</button>
           <button type="button" className="jp-button jp-button--primary" data-testid="jp-open-import" onClick={() => setIsImportOpen(true)}>教材を取り込む</button>
         </div>
         <div className="jp-library-header__copy">
           <p className="jp-eyebrow">MEMORA JAPANESE READER</p>
           <h1>好きな日本語を、<br />今の自分に読める日本語へ。</h1>
-          <p>自分で用意した日本語や教材JSONを、語彙・文法・読み方と一緒に読めます。</p>
+          <p>AI Studioで作った日本語教材JSONや、自分で用意した日本語を、語彙・文法・読み方と一緒に読めます。</p>
         </div>
       </header>
 
@@ -236,7 +248,7 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
         ) : materials.length === 0 ? (
           <div className="jp-empty">
             <strong>まだ日本語教材がありません</strong>
-            <p>JSONを貼り付けるか、日本語本文をそのまま取り込めます。</p>
+            <p>トップでテーマを決めてAIに日本語教材JSONを作らせるか、日本語本文をそのまま取り込めます。</p>
             <button type="button" className="jp-button jp-button--primary" onClick={() => setIsImportOpen(true)}>最初の教材を取り込む</button>
           </div>
         ) : (
@@ -284,8 +296,8 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
                 <>
                   {importTab === 'json-paste' && (
                     <label className="jp-field">
-                      <span>教材JSON</span>
-                      <textarea data-testid="jp-json-input" value={jsonInput} onChange={event => { setJsonInput(event.target.value); setPrepared(null); setError(''); }} rows={12} placeholder={'{\n  "schemaVersion": "memora-jp-reader-v1",\n  ...\n}'} />
+                      <span>日本語Reader教材JSON</span>
+                      <textarea data-testid="jp-json-input" value={jsonInput} onChange={event => { setJsonInput(event.target.value); setPrepared(null); setError(''); }} rows={12} placeholder={'{\n  "schemaVersion": "memora-jp-reader-v1",\n  "mode": "jp-reader",\n  ...\n}'} />
                     </label>
                   )}
                   {importTab === 'json-file' && (
@@ -305,12 +317,12 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
                         <label className="jp-field"><span>権利状態</span><select value={rightsStatus} onChange={event => setRightsStatus(event.target.value as JpRightsStatus)}>{RIGHTS_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
                       </div>
                       <label className="jp-field"><span>元のURL <small>（任意・自動取得はしません）</small></span><input type="url" value={sourceUrl} onChange={event => setSourceUrl(event.target.value)} placeholder="https://..." /></label>
-                      <p className="jp-import-note">本文だけの場合は、読み方・辞書形・文法・翻訳を推測しません。詳細機能には外部AIで作成した教材JSONが必要です。</p>
+                      <p className="jp-import-note">本文だけの場合は、読み方・辞書形・文法・翻訳を推測しません。詳細機能にはトップの作成指示などで外部AIに作らせた教材JSONが必要です。</p>
                     </div>
                   )}
                   {prepared && (
                     <div className="jp-import-preview" role="status">
-                      <strong>教材JSONを確認できました</strong>
+                      <strong>日本語教材JSONを確認できました</strong>
                       <p>{prepared.material.sentences.length}文・単語カード候補{prepared.material.vocabularyCards.length}件・クイズ{prepared.material.quiz.length}問</p>
                       {prepared.repairs.length > 0 && <ul>{prepared.repairs.map(item => <li key={item}>{item}</li>)}</ul>}
                       {prepared.warnings.length > 0 && <details><summary>警告 {prepared.warnings.length}件</summary><ul>{prepared.warnings.slice(0, 12).map((item, index) => <li key={`${index}-${item}`}>{item}</li>)}</ul></details>}
