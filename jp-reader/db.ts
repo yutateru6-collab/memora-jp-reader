@@ -12,6 +12,7 @@ const DB_VERSION = 1;
 const MATERIAL_STORE = 'materials';
 const PROGRESS_STORE = 'progress';
 const CARD_STORE = 'cards';
+const JAPANESE_SCRIPT_RE = /[ぁ-んァ-ヶ一-龯々〆ヵヶ]/u;
 
 let databasePromise: Promise<IDBDatabase> | null = null;
 
@@ -101,10 +102,26 @@ export const findJpMaterialsByTitle = async (title: string): Promise<StoredJpMat
   return records;
 };
 
+const assertJapaneseReaderContent = (content: JapaneseReaderMaterialV1) => {
+  const sentenceTexts = content.sentences.map(sentence => sentence.original.text.trim()).filter(Boolean);
+  if (sentenceTexts.length === 0) throw new Error('日本語本文がありません。保存は行っていません。');
+
+  const japaneseSentenceCount = sentenceTexts.filter(text => JAPANESE_SCRIPT_RE.test(text)).length;
+  if (japaneseSentenceCount / sentenceTexts.length < 0.8) {
+    throw new Error('日本語Reader用の本文として認識できませんでした。英語長文ではなく、日本語の本文を含む教材JSONを作成してください。保存は行っていません。');
+  }
+
+  const invalidAdapted = content.sentences.find(sentence => sentence.adapted?.text?.trim() && !JAPANESE_SCRIPT_RE.test(sentence.adapted.text));
+  if (invalidAdapted) {
+    throw new Error(`「${invalidAdapted.id}」のやさしい日本語版が日本語として認識できませんでした。保存は行っていません。`);
+  }
+};
+
 export const saveJpMaterial = async (
   content: JapaneseReaderMaterialV1,
   options: { replaceId?: number; duplicateTitle?: boolean } = {},
 ): Promise<StoredJpMaterial> => {
+  assertJapaneseReaderContent(content);
   const db = await openDatabase();
   const now = new Date().toISOString();
   const transaction = db.transaction(
