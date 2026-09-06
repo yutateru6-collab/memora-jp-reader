@@ -46,6 +46,27 @@ assert.equal((await getAllJpMaterials()).length, 1);
 assert.equal((await getJpMaterial(saved.id)).content.sentences.length, 2);
 assert.equal((await findJpMaterialsByTitle(material.title)).length, 1);
 
+const englishOnlyMaterial = {
+  ...material,
+  title: 'English-only material should fail',
+  sentences: material.sentences.map((sentence, index) => ({
+    ...sentence,
+    original: {
+      text: index === 0 ? 'This is an English reading passage.' : 'It must not be stored in Japanese Reader.',
+      segments: [{
+        id: `english-${index + 1}`,
+        surface: index === 0 ? 'This is an English reading passage.' : 'It must not be stored in Japanese Reader.',
+      }],
+    },
+    adapted: null,
+  })),
+};
+await assert.rejects(
+  () => saveJpMaterial(englishOnlyMaterial),
+  /日本語Reader用の本文として認識できませんでした/,
+);
+assert.equal((await getAllJpMaterials()).length, 1, 'Rejected English material must not be persisted.');
+
 await saveJpProgress({
   materialId: saved.id,
   readerMode: 'study',
@@ -103,7 +124,8 @@ assert.deepEqual(englishRecords, [{ id: 1, name: '英語教材（保護確認）
 console.log(JSON.stringify({
   status: 'passed',
   cases: [
-    'separate English database', 'save', 'reload', 'title lookup', 'progress', 'exact segment card',
-    'replace and clear stale learning data', 'save as copy', 'quota message', 'cascade delete', 'English record preserved',
+    'separate English database', 'save', 'reload', 'title lookup', 'reject English-only Japanese Reader material',
+    'progress', 'exact segment card', 'replace and clear stale learning data', 'save as copy', 'quota message',
+    'cascade delete', 'English record preserved',
   ],
 }, null, 2));
