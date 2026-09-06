@@ -1,0 +1,1536 @@
+.memora-world,
+.memora-world * {
+  box-sizing: border-box;
+}
+
+.memora-world {
+  --memora-accent: #9f7aea;
+  --memora-accent-strong: #7c3aed;
+  --memora-accent-soft: rgba(159, 122, 234, 0.18);
+  --memora-surface: rgba(10, 22, 55, 0.76);
+  --memora-surface-strong: rgba(12, 23, 58, 0.92);
+  --memora-border: rgba(197, 181, 253, 0.22);
+  --memora-text: #fffaff;
+  --memora-muted: #bcc3da;
+  isolation: isolate;
+  overflow-x: hidden;
+  color: var(--memora-text);
+  background:
+    radial-gradient(circle at 8% 0%, rgba(112, 77, 207, 0.22), transparent 34%),
+    radial-gradient(circle at 94% 16%, rgba(33, 127, 150, 0.16), transparent 31%),
+    linear-gradient(165deg, #050b24 0%, #0b1640 46%, #111044 100%) !important;
+}
+
+.memora-world::before {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: min(220px, 26vh);
+  pointer-events: none;
+  background: url('/create-home/footer-flowers.webp') bottom center / cover no-repeat;
+  opacity: 0.16;
+}
+
+.memora-world:has(.create-home)::before {
+  display: none;
+}
+
+.memora-world > * {
+  position: relative;
+  z-index: 1;
+}
+
+.memora-world--read {
+  --memora-accent: #86e2b0;
+  --memora-accent-strong: #168b69;
+  --memora-accent-soft: rgba(69, 190, 139, 0.16);
+}
+
+.memora-reader-screen {
+  position: relative;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(58, 169, 134, 0.11), transparent 28%),
+    radial-gradient(circle at 88% 18%, rgba(95, 102, 220, 0.12), transparent 30%),
+    linear-gradient(165deg, rgba(3, 10, 31, 0.98), rgba(7, 18, 48, 0.98)) !important;
+}
+
+.memora-reader-screen::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 56px 0 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image:
+    radial-gradient(circle, rgba(255, 230, 167, 0.9) 0 0.65px, transparent 1.1px),
+    radial-gradient(circle, rgba(219, 225, 255, 0.8) 0 0.5px, transparent 1px);
+  background-size: 101px 101px, 157px 157px;
+  background-position: 19px 11px, 64px 38px;
+}
+
+.memora-reader-screen > * {
+  position: relative;
+  z-index: 1;
+}
+
+.memora-reader-header {
+  background: rgba(5, 15, 42, 0.86) !important;
+  border-color: rgba(134, 226, 176, 0.18) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  backdrop-filter: blur(18px) saturate(120%);
+}
+
+.memora-reader-document {
+  padding: 2px;
+}
+
+.memora-reader-guide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 84px;
+  min-height: 96px;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 15px;
+  overflow: hidden;
+  border: 1px solid rgba(134, 226, 176, 0.2);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(48, 145, 111, 0.15), rgba(20, 31, 77, 0.58));
+  box-shadow: 0 14px 38px rgba(1, 7, 29, 0.22);
+}
+
+.memora-reader-guide > div {
+  min-width: 0;
+}
+
+.memora-reader-guide span,
+.memora-reader-complete > div > span {
+  display: block;
+  color: #8ee8b8;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.22em;
+}
+
+.memora-reader-guide strong {
+  display: block;
+  margin-top: 2px;
+  color: #fffaff;
+  font-size: 17px;
+}
+
+.memora-reader-guide small {
+  display: block;
+  margin-top: 5px;
+  color: #bdc9d8;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.memora-reader-guide img {
+  width: 84px;
+  height: 84px;
+  border-radius: 18px;
+  object-fit: cover;
+  object-position: center;
+  box-shadow: 0 8px 24px rgba(0, 8, 31, 0.35);
+}
+
+.memora-reader-sentence {
+  border: 1px solid rgba(191, 203, 232, 0.09);
+  background: linear-gradient(145deg, rgba(13, 25, 58, 0.72), rgba(17, 23, 62, 0.5));
+  box-shadow: 0 12px 32px rgba(1, 6, 25, 0.16);
+}
+
+.memora-reader-explanation {
+  border-color: rgba(134, 226, 176, 0.12) !important;
+  background: rgba(4, 13, 38, 0.48) !important;
+}
+
+.memora-reader-complete {
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr);
+  align-items: center;
+  gap: 18px;
+  padding: 18px;
+  border: 1px solid rgba(134, 226, 176, 0.24);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(43, 153, 112, 0.18), rgba(31, 31, 93, 0.66));
+  box-shadow: 0 18px 46px rgba(1, 7, 29, 0.28);
+}
+
+.memora-reader-complete > img {
+  width: 148px;
+  height: 148px;
+  border-radius: 24px;
+  object-fit: cover;
+  box-shadow: 0 12px 30px rgba(0, 8, 31, 0.34);
+}
+
+.memora-reader-complete h2 {
+  margin: 4px 0 0;
+  color: #fffaff;
+  font-size: 22px;
+  font-weight: 820;
+}
+
+.memora-reader-complete p {
+  margin: 7px 0 0;
+  color: #c5cedd;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.memora-reader-complete > div > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.memora-reader-complete button {
+  min-height: 40px;
+  padding: 0 15px;
+  border: 1px solid rgba(196, 238, 216, 0.2);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #15795d, #3ab182);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.memora-reader-complete button + button {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.memora-world--memorize {
+  --memora-accent: #8bd7ff;
+  --memora-accent-strong: #1677b8;
+  --memora-accent-soft: rgba(74, 172, 231, 0.17);
+}
+
+.memora-world--quiz {
+  --memora-accent: #ffd36f;
+  --memora-accent-strong: #bc7c18;
+  --memora-accent-soft: rgba(242, 187, 66, 0.18);
+}
+
+.memora-world--play {
+  --memora-accent: #ffac6f;
+  --memora-accent-strong: #d56b27;
+  --memora-accent-soft: rgba(239, 123, 53, 0.18);
+}
+
+.memora-world--organize {
+  --memora-accent: #65ddd3;
+  --memora-accent-strong: #128d87;
+  --memora-accent-soft: rgba(43, 190, 181, 0.17);
+}
+
+.memora-deck-screen,
+.memora-card-list-screen,
+.memora-flashcard-screen {
+  width: 100%;
+  color: var(--memora-text);
+}
+
+.memora-deck-screen {
+  min-height: 100dvh;
+  padding: 18px 18px 80px;
+}
+
+.memora-deck-screen__inner {
+  width: min(100%, 960px);
+  margin: 0 auto;
+}
+
+.memora-deck-header {
+  overflow: hidden;
+  border: 1px solid var(--memora-border);
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(45, 131, 192, 0.18), rgba(8, 18, 52, 0.86));
+  box-shadow: 0 22px 58px rgba(1, 5, 24, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
+  backdrop-filter: blur(20px) saturate(120%);
+}
+
+.memora-deck-header__topline {
+  padding: 10px 12px 0;
+}
+
+.memora-deck-header__body {
+  position: relative;
+  display: flex;
+  min-height: 160px;
+  align-items: center;
+  padding: 16px 210px 24px 24px;
+}
+
+.memora-deck-header__body p,
+.memora-deck-empty > p,
+.memora-deck-card__copy > span,
+.memora-card-list-header__title > p,
+.memora-flashcard-header__title > span,
+.memora-flashcard-complete__card > p {
+  margin: 0;
+  color: var(--memora-accent);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.22em;
+}
+
+.memora-deck-header__body h1 {
+  margin: 4px 0 0;
+  font-size: clamp(27px, 4vw, 38px);
+  line-height: 1.2;
+}
+
+.memora-deck-header__body > div > span {
+  display: block;
+  margin-top: 8px;
+  color: var(--memora-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.memora-deck-header__body img {
+  position: absolute;
+  right: 22px;
+  bottom: 14px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid rgba(139, 215, 255, 0.26);
+  border-radius: 28px;
+  object-fit: cover;
+  box-shadow: 0 14px 34px rgba(0, 7, 31, 0.36), 0 0 28px var(--memora-accent-soft);
+}
+
+.memora-deck-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.memora-deck-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(390px, 1.05fr);
+  align-items: center;
+  gap: 18px;
+  min-height: 136px;
+  padding: 20px;
+  border: 1px solid var(--memora-border);
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(40, 113, 176, 0.13), rgba(10, 22, 55, 0.78));
+  box-shadow: 0 16px 42px rgba(1, 6, 26, 0.22);
+}
+
+.memora-deck-card__copy {
+  min-width: 0;
+}
+
+.memora-deck-card__copy h2 {
+  margin: 5px 0 0;
+  overflow-wrap: anywhere;
+  color: #fffaff;
+  font-size: 21px;
+  line-height: 1.35;
+}
+
+.memora-deck-card__copy p {
+  margin: 6px 0 0;
+  color: #abb8ce;
+  font-size: 11px;
+}
+
+.memora-deck-card__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.memora-deck-card__actions button,
+.memora-card-list-header__actions button,
+.memora-card-list-empty button,
+.memora-flashcard-complete__card button,
+.memora-deck-empty button {
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1px solid rgba(201, 218, 255, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #eef3ff;
+  font-size: 12px;
+  font-weight: 780;
+}
+
+.memora-deck-card__actions button.is-primary,
+.memora-card-list-header__actions button.is-primary,
+.memora-flashcard-complete__card button.is-primary,
+.memora-deck-empty button {
+  border-color: rgba(139, 215, 255, 0.28);
+  background: linear-gradient(135deg, #14659b, #238fc1);
+  box-shadow: 0 9px 22px rgba(28, 137, 193, 0.18);
+}
+
+.memora-deck-empty {
+  display: flex;
+  min-height: 520px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 34px 20px;
+  border: 1px solid var(--memora-border);
+  border-radius: 24px;
+  background: rgba(9, 21, 55, 0.74);
+  text-align: center;
+}
+
+.memora-deck-empty img {
+  width: min(190px, 52vw);
+  aspect-ratio: 1;
+  margin-bottom: 16px;
+  border-radius: 30px;
+  object-fit: cover;
+  box-shadow: 0 18px 42px rgba(0, 7, 31, 0.34);
+}
+
+.memora-deck-empty h2 {
+  margin: 6px 0 0;
+  font-size: 24px;
+}
+
+.memora-deck-empty > span {
+  margin-top: 9px;
+  color: var(--memora-muted);
+  font-size: 13px;
+}
+
+.memora-deck-empty button {
+  margin-top: 22px;
+}
+
+.memora-card-list-screen {
+  min-height: 100dvh;
+  padding: 16px 18px 72px;
+}
+
+.memora-card-list-header {
+  position: sticky;
+  z-index: 30;
+  top: 10px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 82px auto;
+  align-items: center;
+  gap: 13px;
+  width: min(100%, 1180px);
+  min-height: 112px;
+  margin: 0 auto 18px;
+  padding: 12px;
+  border: 1px solid var(--memora-border);
+  border-radius: 21px;
+  background: rgba(6, 24, 51, 0.88);
+  box-shadow: 0 18px 48px rgba(1, 6, 27, 0.28);
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
+  backdrop-filter: blur(20px) saturate(120%);
+}
+
+.memora-card-list-header__title {
+  min-width: 0;
+}
+
+.memora-card-list-header__title h1 {
+  margin: 3px 0 0;
+  color: #fffaff;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.memora-card-list-header__title > span {
+  display: block;
+  margin-top: 4px;
+  overflow: hidden;
+  color: #a9becd;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memora-card-list-header > img {
+  width: 78px;
+  height: 78px;
+  border: 1px solid rgba(101, 221, 211, 0.25);
+  border-radius: 18px;
+  object-fit: cover;
+  box-shadow: 0 9px 25px rgba(0, 8, 31, 0.34);
+}
+
+.memora-card-list-header__actions {
+  display: flex;
+  gap: 7px;
+}
+
+.memora-card-list-header__actions button.is-primary {
+  background: linear-gradient(135deg, #117e78, #27aca4);
+}
+
+.memora-card-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  width: min(100%, 1180px);
+  margin: 0 auto;
+}
+
+.memora-card-tile {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  aspect-ratio: 4 / 3;
+  align-items: center;
+  justify-content: center;
+  padding: 29px 14px 24px;
+  overflow: hidden;
+  border: 1px solid rgba(101, 221, 211, 0.18);
+  border-radius: 17px;
+  background: linear-gradient(145deg, rgba(20, 70, 88, 0.33), rgba(10, 23, 58, 0.84));
+  color: #fffaff;
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(1, 7, 28, 0.2);
+}
+
+.memora-card-tile.is-back {
+  border-color: rgba(101, 221, 211, 0.38);
+  background: linear-gradient(145deg, rgba(21, 117, 111, 0.28), rgba(19, 29, 73, 0.82));
+}
+
+.memora-card-tile__face {
+  position: absolute;
+  top: 9px;
+  left: 10px;
+  color: #7fe4dc;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+}
+
+.memora-card-tile strong {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  font-size: 15px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+.memora-card-tile__dots {
+  position: absolute;
+  right: 0;
+  bottom: 10px;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.memora-card-tile__dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(183, 198, 220, 0.35);
+}
+
+.memora-card-tile__dots i.is-active {
+  width: 13px;
+  border-radius: 999px;
+  background: #65ddd3;
+}
+
+.memora-card-list-empty {
+  grid-column: 1 / -1;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: 1px solid var(--memora-border);
+  border-radius: 22px;
+  background: rgba(8, 22, 55, 0.74);
+}
+
+.memora-card-list-empty h2 {
+  font-size: 22px;
+}
+
+.memora-card-list-empty button {
+  margin-top: 18px;
+}
+
+.memora-flashcard-screen {
+  position: relative;
+  background: linear-gradient(165deg, rgba(4, 12, 35, 0.98), rgba(8, 24, 58, 0.98)) !important;
+}
+
+.memora-flashcard-header {
+  border-bottom: 1px solid rgba(139, 215, 255, 0.16);
+  background: rgba(5, 17, 47, 0.88) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  backdrop-filter: blur(18px) saturate(120%);
+}
+
+.memora-flashcard-header__title {
+  min-width: 0;
+  text-align: center;
+}
+
+.memora-flashcard-header__title h1 {
+  max-width: min(48vw, 520px);
+  margin: 2px 0 0;
+  overflow: hidden;
+  font-size: 17px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memora-flashcard-main {
+  background: transparent !important;
+}
+
+.memora-flashcard-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.memora-flashcard-status > span {
+  padding: 3px 8px;
+  border: 1px solid rgba(139, 215, 255, 0.13);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.055);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.memora-flashcard-card {
+  border-color: rgba(139, 215, 255, 0.21) !important;
+  background: linear-gradient(145deg, rgba(19, 39, 87, 0.88), rgba(21, 22, 72, 0.78)) !important;
+  box-shadow: 0 24px 58px rgba(1, 6, 27, 0.32), 0 0 34px rgba(74, 172, 231, 0.08) !important;
+}
+
+.memora-flashcard-card.is-back {
+  background: linear-gradient(145deg, rgba(17, 72, 106, 0.72), rgba(34, 31, 96, 0.76)) !important;
+}
+
+.memora-grade-grid button {
+  min-height: 66px;
+}
+
+.memora-flashcard-complete {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(3, 9, 29, 0.9);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+
+.memora-flashcard-complete__card {
+  width: min(100%, 460px);
+  padding: 24px;
+  border: 1px solid rgba(139, 215, 255, 0.28);
+  border-radius: 26px;
+  background: linear-gradient(145deg, rgba(25, 65, 117, 0.88), rgba(23, 20, 77, 0.92));
+  box-shadow: 0 28px 72px rgba(1, 6, 27, 0.46), 0 0 42px rgba(74, 172, 231, 0.12);
+  text-align: center;
+}
+
+.memora-flashcard-complete__card > img {
+  width: min(210px, 58vw);
+  aspect-ratio: 1;
+  margin: 0 auto 15px;
+  border: 1px solid rgba(139, 215, 255, 0.28);
+  border-radius: 30px;
+  object-fit: cover;
+  box-shadow: 0 16px 40px rgba(0, 7, 31, 0.38);
+}
+
+.memora-flashcard-complete__card h2 {
+  margin: 6px 0 0;
+  color: #fffaff;
+  font-size: 25px;
+}
+
+.memora-flashcard-complete__card > span {
+  display: block;
+  margin-top: 7px;
+  color: #c3d2e3;
+  font-size: 13px;
+}
+
+.memora-flashcard-complete__card > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 20px;
+}
+
+.memora-world--explore {
+  --memora-accent: #f5a6d7;
+  --memora-accent-strong: #c34f95;
+  --memora-accent-soft: rgba(225, 101, 174, 0.17);
+}
+
+.memora-library-screen {
+  width: 100%;
+}
+
+.memora-app-header {
+  position: sticky;
+  top: 12px;
+  z-index: 40;
+  margin-bottom: 28px;
+  overflow: visible;
+  border: 1px solid var(--memora-border);
+  border-radius: 24px;
+  background:
+    linear-gradient(135deg, var(--memora-accent-soft), transparent 48%),
+    rgba(6, 16, 46, 0.84);
+  -webkit-backdrop-filter: blur(20px) saturate(120%);
+  backdrop-filter: blur(20px) saturate(120%);
+  box-shadow: 0 22px 58px rgba(1, 5, 24, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.memora-app-header__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px 0;
+}
+
+.memora-app-header__actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.memora-app-header__body {
+  position: relative;
+  display: flex;
+  min-height: 126px;
+  align-items: center;
+  padding: 10px 156px 18px 22px;
+}
+
+.memora-app-header__copy {
+  min-width: 0;
+}
+
+.memora-app-header__role,
+.memora-empty-state__role,
+.memora-modal__eyebrow {
+  margin: 0 0 5px;
+  color: var(--memora-accent);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.24em;
+}
+
+.memora-app-header h1 {
+  margin: 0;
+  color: var(--memora-text);
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+.memora-app-header__copy > p:last-child {
+  margin: 7px 0 0;
+  color: var(--memora-muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.memora-app-header__character {
+  position: absolute;
+  right: 19px;
+  bottom: 10px;
+  width: 126px;
+  height: 126px;
+  border-radius: 26px;
+  object-fit: cover;
+  object-position: center;
+  border: 1px solid rgba(152, 232, 190, 0.3);
+  box-shadow: 0 12px 28px rgba(0, 8, 32, 0.34), 0 0 26px var(--memora-accent-soft);
+}
+
+.memora-header-button,
+.memora-button {
+  min-height: 42px;
+  border: 1px solid rgba(215, 221, 255, 0.17);
+  border-radius: 13px;
+  color: #fff;
+  font-weight: 750;
+  transition: transform 150ms ease, filter 150ms ease, background 150ms ease;
+}
+
+.memora-header-button:active,
+.memora-button:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.memora-header-button--back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #e8e7f5;
+  font-size: 12px;
+}
+
+.memora-header-button--back > span:first-child {
+  color: var(--memora-accent);
+  font-size: 18px;
+}
+
+.memora-header-button--primary,
+.memora-button--primary {
+  padding: 0 16px;
+  background: linear-gradient(135deg, var(--memora-accent-strong), var(--memora-accent));
+  box-shadow: 0 10px 24px var(--memora-accent-soft);
+}
+
+.memora-button--secondary {
+  padding: 0 16px;
+  background: rgba(255, 255, 255, 0.075);
+  color: #f2f1fa;
+}
+
+.memora-header-button--icon {
+  display: grid;
+  width: 42px;
+  padding: 0;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.065);
+}
+
+.memora-header-button.is-active {
+  width: auto;
+  padding: 0 12px;
+  background: var(--memora-accent-strong);
+}
+
+.memora-header-menu {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(280px, calc(100vw - 32px));
+  overflow: hidden;
+  border: 1px solid var(--memora-border);
+  border-radius: 17px;
+  background: rgba(7, 17, 48, 0.97);
+  box-shadow: 0 24px 58px rgba(0, 5, 25, 0.44);
+  -webkit-backdrop-filter: blur(22px);
+  backdrop-filter: blur(22px);
+}
+
+.memora-header-menu > button {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 15px;
+  border: 0;
+  border-bottom: 1px solid rgba(201, 196, 255, 0.09);
+  background: transparent;
+  color: #edeef8;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.memora-header-menu > button:hover {
+  background: rgba(255, 255, 255, 0.065);
+}
+
+.memora-header-menu__theme {
+  display: grid;
+  grid-template-columns: 1fr 116px;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 15px;
+  color: #c3c8dc;
+  font-size: 12px;
+}
+
+.memora-header-menu__theme select {
+  min-height: 34px;
+  border: 1px solid rgba(203, 213, 255, 0.16);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  padding: 0 8px;
+}
+
+.memora-header-menu__danger {
+  color: #ffb7c5 !important;
+}
+
+.memora-section-title {
+  margin: 0 0 11px;
+  color: #f8f6ff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.memora-recent > div,
+.memora-material-card,
+.memora-empty-state,
+.memora-modal {
+  border-color: var(--memora-border) !important;
+  background:
+    linear-gradient(145deg, var(--memora-accent-soft), transparent 50%),
+    var(--memora-surface) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(115%);
+  backdrop-filter: blur(16px) saturate(115%);
+}
+
+.memora-recent > div {
+  box-shadow: 0 20px 52px rgba(1, 5, 24, 0.28), 0 0 32px var(--memora-accent-soft) !important;
+}
+
+.memora-material-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 25px;
+  margin: 3px 0 12px;
+}
+
+.memora-material-card__meta span {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  padding: 0 9px;
+  border: 1px solid rgba(171, 229, 201, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.055);
+  color: #dce7e7;
+  font-size: 10px;
+  font-weight: 720;
+}
+
+.memora-empty-state {
+  display: flex;
+  min-height: 500px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 34px 22px;
+  border: 1px solid var(--memora-border);
+  border-radius: 26px;
+  text-align: center;
+  box-shadow: 0 22px 58px rgba(1, 5, 24, 0.24);
+}
+
+.memora-empty-state > img {
+  width: min(210px, 55vw);
+  aspect-ratio: 1;
+  margin-bottom: 16px;
+  border-radius: 34px;
+  object-fit: cover;
+  box-shadow: 0 18px 42px rgba(0, 7, 31, 0.36), 0 0 34px var(--memora-accent-soft);
+}
+
+.memora-empty-state h2 {
+  margin: 0;
+  color: #fffaff;
+  font-size: 26px;
+  font-weight: 820;
+}
+
+.memora-empty-state > p:not(.memora-empty-state__role) {
+  margin: 10px 0 0;
+  color: var(--memora-muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.memora-empty-state__actions {
+  display: flex;
+  width: min(100%, 520px);
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.memora-empty-state__actions > button {
+  flex: 1;
+}
+
+.memora-modal-backdrop {
+  inset: auto !important;
+  top: var(--memora-modal-viewport-top, 0px) !important;
+  left: var(--memora-modal-viewport-left, 0px) !important;
+  width: var(--memora-modal-viewport-width, 100vw);
+  height: var(--memora-modal-viewport-height, 100dvh);
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  padding-top: max(16px, env(safe-area-inset-top));
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+.memora-modal {
+  min-height: 0;
+  background:
+    linear-gradient(145deg, rgba(34, 121, 105, 0.15), transparent 46%),
+    var(--memora-surface-strong) !important;
+}
+
+.memora-modal__header,
+.memora-modal__footer {
+  flex: 0 0 auto;
+}
+
+.memora-modal__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--memora-accent-strong) transparent;
+}
+
+.memora-import-textarea {
+  height: clamp(132px, 24vh, 220px);
+  min-height: 132px;
+  max-height: 220px;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.memora-import-preview {
+  padding: 13px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.045) !important;
+}
+
+.memora-import-preview__status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.memora-import-preview__status strong {
+  color: #dffcf1;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.memora-import-preview__status span {
+  flex: none;
+  color: #8ee8b8;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.memora-import-preview__status--invalid strong,
+.memora-import-preview__status--invalid span {
+  color: #ffc2cc;
+}
+
+.memora-import-preview__error,
+.memora-import-preview__notice {
+  margin: 9px 0 0;
+  padding: 9px 10px;
+  border-radius: 9px;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.memora-import-preview__error {
+  border: 1px solid rgba(255, 117, 141, 0.24);
+  background: rgba(255, 82, 112, 0.09);
+  color: #ffc2cc;
+}
+
+.memora-import-preview__notice {
+  border: 1px solid rgba(142, 232, 184, 0.2);
+  background: rgba(142, 232, 184, 0.07);
+  color: #bdf2d4;
+}
+
+.memora-import-preview pre {
+  display: -webkit-box;
+  margin: 10px 0 0;
+  overflow: hidden;
+  color: #bec8da;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+}
+
+.memora-import-preview__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.memora-import-preview__actions button,
+.memora-import-edit-done {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(142, 232, 184, 0.2);
+  border-radius: 10px;
+  background: rgba(142, 232, 184, 0.09);
+  color: #bdf2d4;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.memora-import-preview__actions button:last-child {
+  border-color: rgba(218, 224, 243, 0.16);
+  background: rgba(255, 255, 255, 0.055);
+  color: #d7dced;
+}
+
+.memora-import-edit-done {
+  width: 100%;
+  margin-top: 8px;
+}
+
+body.memora-import-modal-open {
+  overflow: hidden !important;
+}
+
+body.memora-import-modal-open .memora-world--read {
+  overflow: hidden !important;
+}
+
+.memora-field-label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.memora-field-label small {
+  color: #9fa8c2;
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.memora-field-help {
+  margin: -2px 0 8px;
+  color: #aab2ca;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.memora-file-picker {
+  min-height: 132px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+@media (max-width: 640px) {
+  .memora-world::before {
+    height: 155px;
+    opacity: 0.12;
+  }
+
+  .memora-deck-screen {
+    padding: 9px 10px 70px;
+  }
+
+  .memora-deck-header {
+    border-radius: 20px;
+  }
+
+  .memora-deck-header__topline {
+    padding: 8px 8px 0;
+  }
+
+  .memora-deck-header__body {
+    min-height: 118px;
+    padding: 10px 108px 16px 15px;
+  }
+
+  .memora-deck-header__body h1 {
+    font-size: 23px;
+  }
+
+  .memora-deck-header__body > div > span {
+    margin-top: 5px;
+    font-size: 10px;
+    line-height: 1.55;
+  }
+
+  .memora-deck-header__body img {
+    right: 10px;
+    bottom: 10px;
+    width: 91px;
+    height: 91px;
+    border-radius: 21px;
+  }
+
+  .memora-deck-list {
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .memora-deck-card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding: 15px;
+    border-radius: 18px;
+  }
+
+  .memora-deck-card__copy h2 {
+    font-size: 18px;
+  }
+
+  .memora-deck-card__actions button {
+    min-height: 46px;
+  }
+
+  .memora-card-list-screen {
+    padding: 8px 9px 64px;
+  }
+
+  .memora-card-list-header {
+    top: 6px;
+    grid-template-columns: auto minmax(0, 1fr) 58px;
+    gap: 8px;
+    min-height: 126px;
+    margin-bottom: 12px;
+    padding: 9px;
+    border-radius: 18px;
+  }
+
+  .memora-card-list-header__title h1 {
+    font-size: 17px;
+  }
+
+  .memora-card-list-header > img {
+    width: 56px;
+    height: 56px;
+    border-radius: 15px;
+  }
+
+  .memora-card-list-header__actions {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .memora-card-list-header__actions button {
+    min-height: 40px;
+    font-size: 11px;
+  }
+
+  .memora-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .memora-card-tile {
+    padding: 27px 10px 22px;
+    border-radius: 15px;
+  }
+
+  .memora-card-tile strong {
+    font-size: 13px;
+  }
+
+  .memora-flashcard-header {
+    padding: 8px !important;
+  }
+
+  .memora-flashcard-header .memora-header-button--back {
+    min-width: 38px;
+    justify-content: center;
+  }
+
+  .memora-flashcard-header__title h1 {
+    max-width: 42vw;
+    font-size: 14px;
+  }
+
+  .memora-flashcard-main {
+    padding: 10px !important;
+  }
+
+  .memora-flashcard-main > div:first-child > img {
+    width: 54px !important;
+    max-height: 54px !important;
+    border-radius: 14px;
+  }
+
+  .memora-flashcard-status {
+    max-width: calc(100% - 62px);
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .memora-flashcard-card {
+    height: min(42dvh, 330px) !important;
+    padding: 24px 16px !important;
+  }
+
+  .memora-grade-grid button {
+    min-height: 57px;
+    padding: 8px !important;
+    font-size: 12px;
+  }
+
+  .memora-flashcard-complete__card {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .memora-flashcard-complete__card > img {
+    width: min(170px, 48vw);
+    border-radius: 25px;
+  }
+
+  .memora-flashcard-complete__card h2 {
+    font-size: 21px;
+  }
+
+  .memora-reader-scroll {
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+  }
+
+  .memora-reader-guide {
+    grid-template-columns: minmax(0, 1fr) 68px;
+    min-height: 82px;
+    padding: 10px 11px;
+  }
+
+  .memora-reader-guide strong {
+    font-size: 15px;
+  }
+
+  .memora-reader-guide img {
+    width: 68px;
+    height: 68px;
+    border-radius: 15px;
+  }
+
+  .memora-reader-sentence {
+    padding: 14px 12px !important;
+  }
+
+  .memora-reader-complete {
+    grid-template-columns: 86px minmax(0, 1fr);
+    gap: 12px;
+    padding: 13px;
+    border-radius: 18px;
+  }
+
+  .memora-reader-complete > img {
+    width: 86px;
+    height: 86px;
+    border-radius: 18px;
+  }
+
+  .memora-reader-complete h2 {
+    font-size: 17px;
+  }
+
+  .memora-reader-complete p {
+    font-size: 10px;
+  }
+
+  .memora-reader-complete button {
+    min-height: 38px;
+    padding: 0 11px;
+    font-size: 11px;
+  }
+
+  .memora-library-screen {
+    padding: 10px 10px 90px !important;
+  }
+
+  .memora-app-header {
+    top: 8px;
+    margin-bottom: 20px;
+    border-radius: 20px;
+  }
+
+  .memora-app-header__topline {
+    padding: 8px 8px 0;
+  }
+
+  .memora-app-header__body {
+    min-height: 112px;
+    padding: 8px 112px 15px 15px;
+  }
+
+  .memora-app-header__character {
+    right: 11px;
+    bottom: 10px;
+    width: 91px;
+    height: 91px;
+    border-radius: 22px;
+  }
+
+  .memora-app-header h1 {
+    font-size: 22px;
+  }
+
+  .memora-app-header__copy > p:last-child {
+    margin-top: 5px;
+    font-size: 11px;
+  }
+
+  .memora-header-button {
+    min-height: 38px;
+  }
+
+  .memora-header-button--back {
+    padding: 0 9px;
+  }
+
+  .memora-header-button--back > span:last-child {
+    display: none;
+  }
+
+  .memora-header-button--primary {
+    padding: 0 12px;
+    font-size: 11px;
+  }
+
+  .memora-header-button--icon {
+    width: 38px;
+  }
+
+  .memora-empty-state {
+    min-height: 470px;
+    padding: 26px 17px;
+  }
+
+  .memora-empty-state h2 {
+    font-size: 22px;
+  }
+
+  .memora-empty-state__actions {
+    flex-direction: column;
+  }
+
+  .memora-empty-state__actions > button {
+    min-height: 48px;
+    flex: auto;
+  }
+
+  .memora-modal-backdrop {
+    align-items: flex-end !important;
+    padding: 0 !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .memora-modal {
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    width: 100%;
+    height: var(--memora-modal-viewport-height, 100dvh);
+    max-height: var(--memora-modal-viewport-height, 100dvh) !important;
+    border-radius: 24px 24px 0 0 !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .memora-modal__header,
+  .memora-modal__footer {
+    padding: 16px !important;
+  }
+
+  .memora-modal__header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 44px;
+    align-items: center !important;
+    gap: 10px;
+    padding-top: max(10px, env(safe-area-inset-top)) !important;
+    padding-bottom: 10px !important;
+  }
+
+  .memora-modal__header h2 {
+    overflow: hidden;
+    font-size: 20px !important;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .memora-modal__header > button {
+    grid-column: 2;
+    grid-row: 1;
+    width: 44px;
+    height: 44px;
+    justify-self: end;
+  }
+
+  .memora-modal__eyebrow {
+    margin-bottom: 2px;
+    font-size: 9px;
+  }
+
+  .memora-modal__footer {
+    padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+  }
+
+  .memora-modal__body {
+    padding: 16px !important;
+    scroll-padding-bottom: 16px;
+  }
+
+  .memora-modal--keyboard-open {
+    grid-template-rows: auto minmax(0, 1fr) !important;
+  }
+
+  .memora-modal--keyboard-open .memora-modal__footer {
+    display: none;
+  }
+
+  .memora-modal input,
+  .memora-modal textarea,
+  .memora-modal select {
+    font-size: 16px !important;
+  }
+
+  .memora-import-textarea {
+    height: min(180px, 28dvh);
+    min-height: 132px;
+    max-height: min(180px, 28dvh);
+  }
+
+  .memora-import-preview pre {
+    font-size: 11px;
+    -webkit-line-clamp: 4;
+  }
+}

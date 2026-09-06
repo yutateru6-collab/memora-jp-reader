@@ -1,0 +1,113 @@
+name: QA Screenshots
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qa-screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  capture-screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install app dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Verify production build
+        run: npm run build
+
+      - name: Verify exact user material parser and safe repairs
+        run: |
+          npx esbuild lib/readingMaterialImport.ts --bundle --platform=node --format=esm --outfile=/tmp/memora-reading-import.mjs
+          node tools/import-parser-smoke.mjs
+
+      - name: Verify Japanese Reader schema and safe persistence
+        run: |
+          npm run qa:jp-import
+          npm run qa:jp-db
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.62.1
+          npx playwright install --with-deps chromium webkit
+
+      - name: Start Vite app
+        run: |
+          npm run dev > /tmp/memora-vite.log 2>&1 &
+          echo $! > /tmp/memora-vite.pid
+
+      - name: Wait for app
+        run: |
+          for i in {1..60}; do
+            if curl --fail --silent http://127.0.0.1:3000 > /dev/null; then
+              echo "App is ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/memora-vite.log || true
+          exit 1
+
+      - name: Run responsive browser QA
+        run: node tools/capture-screenshots.mjs
+        env:
+          APP_URL: http://127.0.0.1:3000
+          QA_REPOSITORY: ${{ github.repository }}
+          QA_COMMIT_SHA: ${{ github.sha }}
+          QA_RUN_ID: ${{ github.run_id }}
+          QA_RUN_NUMBER: ${{ github.run_number }}
+          QA_EVENT_NAME: ${{ github.event_name }}
+
+      - name: Run READON knowledge depth QA
+        run: node tools/knowledge-depth-qa.mjs
+        env:
+          APP_URL: http://127.0.0.1:3000
+
+      - name: Run exact, atomic, and tolerant READON import QA
+        run: node tools/readon-strict-contract-qa.mjs
+        env:
+          APP_URL: http://127.0.0.1:3000
+
+      - name: Run iPhone WebKit regression QA
+        if: always()
+        run: node tools/mobile-webkit-regression.mjs
+        env:
+          APP_URL: http://127.0.0.1:3000
+
+      - name: Run Japanese Reader responsive QA
+        if: always()
+        run: node tools/jp-reader-browser-qa.mjs
+        env:
+          APP_URL: http://127.0.0.1:3000
+
+      - name: Retain QA evidence briefly
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-evidence-${{ github.run_id }}
+          path: qa-artifacts/
+          if-no-files-found: warn
+          retention-days: 1

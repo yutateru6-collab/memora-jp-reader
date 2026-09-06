@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "memora-jp-reader-v1",
+  "mode": "jp-reader",
+  "title": "一日の読み方",
+  "targetLevel": "N3",
+  "source": {
+    "type": "ai-generated",
+    "title": "QA用オリジナル教材",
+    "author": "MEMORA QA",
+    "url": "https://example.com/japanese-reader-source",
+    "rightsStatus": "unknown",
+    "importedAt": "2026-09-04T00:00:00.000Z"
+  },
+  "visibility": "private",
+  "publicShareAllowed": false,
+  "analysisStatus": "complete",
+  "sentences": [
+    {
+      "id": "s1",
+      "original": {
+        "text": "一日、日本語を勉強した。",
+        "segments": [
+          { "id": "s1-o-1", "lexemeId": "ichinichi-day", "surface": "一日", "reading": "いちにち", "lemma": "一日", "partOfSpeech": "名詞", "contextualGloss": "一日間", "jlptEstimate": "N5", "register": "一般", "example": "一日ゆっくり休みました。" },
+          { "id": "s1-o-2", "surface": "、" },
+          { "id": "s1-o-3", "lexemeId": "nihongo", "surface": "日本語", "reading": "にほんご", "lemma": "日本語", "partOfSpeech": "名詞", "contextualGloss": "Japanese language", "jlptEstimate": "N5", "register": "一般" },
+          { "id": "s1-o-4", "surface": "を", "reading": "を", "lemma": "を", "partOfSpeech": "助詞", "contextualGloss": "目的語を示す", "jlptEstimate": "N5" },
+          { "id": "s1-o-5", "lexemeId": "benkyou-suru", "surface": "勉強し", "reading": "べんきょうし", "lemma": "勉強する", "partOfSpeech": "動詞", "conjugation": "連用形", "contextualGloss": "study", "jlptEstimate": "N5", "register": "一般" },
+          { "id": "s1-o-6", "surface": "た", "reading": "た", "lemma": "た", "partOfSpeech": "助動詞", "conjugation": "終止形", "contextualGloss": "過去", "jlptEstimate": "N5" },
+          { "id": "s1-o-7", "surface": "。" }
+        ]
+      },
+      "adapted": {
+        "text": "一日、日本語を勉強しました。",
+        "isAiGenerated": true,
+        "segments": [
+          { "id": "s1-a-1", "lexemeId": "ichinichi-day", "surface": "一日", "reading": "いちにち", "lemma": "一日", "partOfSpeech": "名詞", "contextualGloss": "一日間", "jlptEstimate": "N5", "register": "一般" },
+          { "id": "s1-a-2", "surface": "、" },
+          { "id": "s1-a-3", "lexemeId": "nihongo", "surface": "日本語", "reading": "にほんご", "lemma": "日本語", "partOfSpeech": "名詞", "contextualGloss": "Japanese language", "jlptEstimate": "N5", "register": "一般" },
+          { "id": "s1-a-4", "surface": "を", "reading": "を", "lemma": "を", "partOfSpeech": "助詞", "contextualGloss": "目的語を示す", "jlptEstimate": "N5" },
+          { "id": "s1-a-5", "lexemeId": "benkyou-suru", "surface": "勉強し", "reading": "べんきょうし", "lemma": "勉強する", "partOfSpeech": "動詞", "conjugation": "連用形", "contextualGloss": "study", "jlptEstimate": "N5", "register": "一般" },
+          { "id": "s1-a-6", "surface": "ました", "reading": "ました", "lemma": "ます", "partOfSpeech": "助動詞", "conjugation": "過去・丁寧形", "contextualGloss": "丁寧な過去", "jlptEstimate": "N5", "register": "丁寧" },
+          { "id": "s1-a-7", "surface": "。" }
+        ]
+      },
+      "translation": { "language": "en", "text": "I studied Japanese for a day." },
+      "grammar": [
+        { "id": "g1", "pattern": "名詞＋を＋動詞", "meaning": "object marker", "explanation": "「を」は動作の対象を示します。", "segmentIds": ["s1-o-4", "s1-o-5"], "register": "一般", "example": "本を読みます。" }
+      ],
+      "omittedElements": ["主語の「私が」が文脈から省略されています。"],
+      "nuanceNotes": ["原文の「した」は普通体で、簡潔な語り方です。"],
+      "cultureNote": null,
+      "adaptationReasons": ["普通体の「した」を、学習者が認識しやすい丁寧体の「しました」にしました。"],
+      "confidence": 0.98,
+      "warnings": []
+    },
+    {
+      "id": "s2",
+      "original": {
+        "text": "四月一日に東京へ行く。😊",
+        "segments": [
+          { "id": "s2-o-1", "surface": "四月", "reading": "しがつ", "lemma": "四月", "partOfSpeech": "名詞", "contextualGloss": "April", "jlptEstimate": "N5", "register": "一般" },
+          { "id": "s2-o-2", "lexemeId": "tsuitachi-date", "surface": "一日", "reading": "ついたち", "lemma": "一日", "partOfSpeech": "名詞", "contextualGloss": "the first day of the month", "jlptEstimate": "N5", "register": "日付" },
+          { "id": "s2-o-3", "surface": "に", "reading": "に", "lemma": "に", "partOfSpeech": "助詞", "contextualGloss": "時点を示す", "jlptEstimate": "N5" },
+          { "id": "s2-o-4", "surface": "東京", "reading": "とうきょう", "lemma": "東京", "partOfSpeech": "固有名詞", "contextualGloss": "Tokyo", "jlptEstimate": "N5", "register": "地名" },
+          { "id": "s2-o-5", "surface": "へ", "reading": "へ", "lemma": "へ", "partOfSpeech": "助詞", "contextualGloss": "方向を示す", "jlptEstimate": "N5" },
+          { "id": "s2-o-6", "surface": "行く", "reading": "いく", "lemma": "行く", "partOfSpeech": "動詞", "conjugation": "終止形", "contextualGloss": "go", "jlptEstimate": "N5", "register": "一般" },
+          { "id": "s2-o-7", "surface": "。" },
+          { "id": "s2-o-8", "surface": "😊" }
+        ]
+      },
+      "adapted": null,
+      "translation": { "language": "en", "text": "I will go to Tokyo on April 1. 😊" },
+      "grammar": [],
+      "omittedElements": ["主語が省略されています。"],
+      "nuanceNotes": ["予定として自然に読めます。"],
+      "cultureNote": "日本語の日付では「一日」を「ついたち」と読みます。",
+      "adaptationReasons": [],
+      "confidence": 0.97,
+      "warnings": ["易しい日本語版はありません。"]
+    }
+  ],
+  "vocabularyCards": [
+    { "id": "v1", "sentenceId": "s1", "segmentId": "s1-o-1", "variant": "original", "lexemeId": "ichinichi-day", "surface": "一日", "reading": "いちにち", "lemma": "一日", "meaning": "一日間", "example": "一日ゆっくり休みました。" },
+    { "id": "v2", "sentenceId": "s2", "segmentId": "s2-o-2", "variant": "original", "lexemeId": "tsuitachi-date", "surface": "一日", "reading": "ついたち", "lemma": "一日", "meaning": "月の最初の日" }
+  ],
+  "quiz": [
+    { "id": "q1", "question": "「四月一日」の「一日」はどう読みますか。", "choices": ["いちにち", "ついたち", "ひとひ"], "correctAnswerIndex": 1, "explanation": "日付の1日は「ついたち」と読みます。" }
+  ],
+  "confidence": 0.98,
+  "warnings": []
+}
