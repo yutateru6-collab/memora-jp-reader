@@ -56,7 +56,13 @@ interface LearningSummary {
   grammarNotes: number;
 }
 
-const EMPTY_SUMMARY: LearningSummary = { totalSeconds: 0, registeredWords: 0, dueWords: 0, knownWords: 0, grammarNotes: 0 };
+const EMPTY_SUMMARY: LearningSummary = {
+  totalSeconds: 0,
+  registeredWords: 0,
+  dueWords: 0,
+  knownWords: 0,
+  grammarNotes: 0,
+};
 
 const copyText = async (text: string) => {
   try {
@@ -67,6 +73,7 @@ const copyText = async (text: string) => {
     textarea.style.position = 'fixed';
     textarea.style.opacity = '0';
     document.body.appendChild(textarea);
+    textarea.focus();
     textarea.select();
     document.execCommand('copy');
     textarea.remove();
@@ -99,6 +106,7 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
   const importLockRef = useRef(false);
 
   const reload = useCallback(async () => {
+    setLoading(true);
     try {
       await initJpReaderDB();
       const [nextMaterials, progress, cards, due, known, grammar] = await Promise.all([
@@ -134,7 +142,9 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
         setImportTab('json-paste');
         setIsImportOpen(true);
       }
-    } catch { /* continue with normal library */ }
+    } catch {
+      // sessionStorageが利用できない環境では通常のライブラリ表示を続ける。
+    }
   }, []);
 
   const resetImport = useCallback(() => {
@@ -155,11 +165,17 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
     if (!isImportOpen && !deleteTarget) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const focusTimer = isImportOpen ? window.setTimeout(() => firstTabRef.current?.focus({ preventScroll: true }), 0) : undefined;
+    const focusTimer = isImportOpen
+      ? window.setTimeout(() => firstTabRef.current?.focus({ preventScroll: true }), 0)
+      : undefined;
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
-      if (isImportOpen && !isImporting) { setIsImportOpen(false); resetImport(); }
-      else if (deleteTarget) setDeleteTarget(null);
+      if (isImportOpen && !isImporting) {
+        setIsImportOpen(false);
+        resetImport();
+      } else if (deleteTarget) {
+        setDeleteTarget(null);
+      }
     };
     document.addEventListener('keydown', closeOnEscape);
     return () => {
@@ -196,7 +212,10 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
     }
   };
 
-  const finishSave = async (material: JapaneseReaderMaterialV1, options?: { replaceId?: number; duplicateTitle?: boolean }) => {
+  const finishSave = async (
+    material: JapaneseReaderMaterialV1,
+    options?: { replaceId?: number; duplicateTitle?: boolean },
+  ) => {
     const saved = await saveJpMaterial(material, options);
     await reload();
     setSuccess(`「${saved.title}」を取り込みました。`);
@@ -214,7 +233,13 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
     try {
       let material: JapaneseReaderMaterialV1;
       if (importTab === 'plain-text') {
-        material = createMaterialFromPlainJapanese({ text: plainText, title: plainTitle, targetLevel, sourceUrl, rightsStatus });
+        material = createMaterialFromPlainJapanese({
+          text: plainText,
+          title: plainTitle,
+          targetLevel,
+          sourceUrl,
+          rightsStatus,
+        });
       } else if (!prepared) {
         setPrepared(prepareJapaneseReaderImport(jsonInput));
         return;
@@ -222,7 +247,10 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
         material = prepared.material;
       }
       const matches = await findJpMaterialsByTitle(material.title);
-      if (matches.length > 0) { setDuplicate({ material, existing: matches[0] }); return; }
+      if (matches.length > 0) {
+        setDuplicate({ material, existing: matches[0] });
+        return;
+      }
       await finishSave(material);
     } catch (importError) {
       setError(formatJpImportError(importError));
@@ -236,8 +264,12 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
     if (!duplicate || importLockRef.current) return;
     importLockRef.current = true;
     setIsImporting(true);
+    setError('');
     try {
-      await finishSave(duplicate.material, choice === 'replace' ? { replaceId: duplicate.existing.id } : { duplicateTitle: true });
+      await finishSave(
+        duplicate.material,
+        choice === 'replace' ? { replaceId: duplicate.existing.id } : { duplicateTitle: true },
+      );
     } catch (saveError) {
       setError(formatJpImportError(saveError));
     } finally {
@@ -265,16 +297,50 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
     window.open(AI_STUDIO_URL, '_blank', 'noopener,noreferrer');
   };
 
-  if (panel === 'review') return <main className="jp-library"><JapaneseReviewPanel onBack={() => { setPanel('library'); void reload(); }} onChanged={reload} /></main>;
-  if (panel === 'known') return <main className="jp-library"><JapaneseKnownWords onBack={() => { setPanel('library'); void reload(); }} onChanged={reload} /></main>;
-  if (panel === 'grammar') return <main className="jp-library"><JapaneseGrammarNotebook onBack={() => { setPanel('library'); void reload(); }} onChanged={reload} /></main>;
+  if (panel === 'review') {
+    return (
+      <main className="jp-library">
+        <JapaneseReviewPanel
+          onBack={() => { setPanel('library'); void reload(); }}
+          onChanged={reload}
+        />
+      </main>
+    );
+  }
+  if (panel === 'known') {
+    return (
+      <main className="jp-library">
+        <JapaneseKnownWords
+          onBack={() => { setPanel('library'); void reload(); }}
+          onChanged={reload}
+        />
+      </main>
+    );
+  }
+  if (panel === 'grammar') {
+    return (
+      <main className="jp-library">
+        <JapaneseGrammarNotebook
+          onBack={() => { setPanel('library'); void reload(); }}
+          onChanged={reload}
+        />
+      </main>
+    );
+  }
 
   return (
     <main className="jp-library" data-testid="jp-library">
       <header className="jp-library-header">
         <div className="jp-library-header__top">
           <button type="button" className="jp-button jp-button--quiet" onClick={onBack}>← 作成トップ</button>
-          <button type="button" className="jp-button jp-button--primary" data-testid="jp-open-import" onClick={() => setIsImportOpen(true)}>教材を取り込む</button>
+          <button
+            type="button"
+            className="jp-button jp-button--primary"
+            data-testid="jp-open-import"
+            onClick={() => setIsImportOpen(true)}
+          >
+            教材を取り込む
+          </button>
         </div>
         <div className="jp-library-header__copy">
           <p className="jp-eyebrow">MEMORA JAPANESE READER</p>
@@ -286,23 +352,52 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
       {error && !isImportOpen && <pre className="jp-banner jp-banner--error" role="alert">{error}</pre>}
       {success && <p className="jp-banner jp-banner--success" role="status">{success}</p>}
 
-      <section className="jp-learning-dashboard" data-testid="jp-learning-dashboard" aria-label="日本語学習状況">
-        <div><strong>{Math.floor(summary.totalSeconds / 60)}</strong><span>読書分</span></div>
-        <div><strong>{summary.registeredWords}</strong><span>登録語</span></div>
-        <div><strong>{summary.knownWords}</strong><span>既知語</span></div>
-        <div><strong>{summary.grammarNotes}</strong><span>文法</span></div>
-      </section>
+      {loading ? (
+        <section
+          className="jp-learning-dashboard jp-learning-dashboard--loading"
+          data-testid="jp-learning-dashboard"
+          aria-label="日本語学習状況"
+          aria-busy="true"
+          role="status"
+        >
+          <div className="jp-learning-dashboard__loading">学習状況を読み込んでいます…</div>
+        </section>
+      ) : (
+        <section className="jp-learning-dashboard" data-testid="jp-learning-dashboard" aria-label="日本語学習状況">
+          <div><strong>{Math.floor(summary.totalSeconds / 60)}</strong><span>読書分</span></div>
+          <div><strong>{summary.registeredWords}</strong><span>登録語</span></div>
+          <div><strong>{summary.knownWords}</strong><span>既知語</span></div>
+          <div><strong>{summary.grammarNotes}</strong><span>文法</span></div>
+        </section>
+      )}
 
-      <section className="jp-learning-actions" aria-label="学習メニュー">
-        <button type="button" data-testid="jp-open-review" onClick={() => setPanel('review')}><span>今日の単語復習</span><strong>{summary.dueWords}語</strong></button>
-        <button type="button" data-testid="jp-open-known" onClick={() => setPanel('known')}><span>知っている語</span><strong>{summary.knownWords}語</strong></button>
-        <button type="button" data-testid="jp-open-grammar" onClick={() => setPanel('grammar')}><span>文法ノート</span><strong>{summary.grammarNotes}件</strong></button>
+      <section className="jp-learning-actions" aria-label="学習メニュー" aria-busy={loading}>
+        <button type="button" data-testid="jp-open-review" disabled={loading} onClick={() => setPanel('review')}>
+          <span>今日の単語復習</span><strong>{loading ? '…' : `${summary.dueWords}語`}</strong>
+        </button>
+        <button type="button" data-testid="jp-open-known" disabled={loading} onClick={() => setPanel('known')}>
+          <span>知っている語</span><strong>{loading ? '…' : `${summary.knownWords}語`}</strong>
+        </button>
+        <button type="button" data-testid="jp-open-grammar" disabled={loading} onClick={() => setPanel('grammar')}>
+          <span>文法ノート</span><strong>{loading ? '…' : `${summary.grammarNotes}件`}</strong>
+        </button>
       </section>
 
       <section className="jp-library-list" aria-labelledby="jp-library-title">
-        <div className="jp-section-heading"><div><p className="jp-eyebrow">LIBRARY</p><h2 id="jp-library-title">日本語教材</h2></div><span>{materials.length}件</span></div>
-        {loading ? <p className="jp-empty">教材を読み込んでいます…</p> : materials.length === 0 ? (
-          <div className="jp-empty"><strong>まだ日本語教材がありません</strong><p>AIで教材JSONを作るか、日本語本文をそのまま取り込めます。</p><button type="button" className="jp-button jp-button--primary" onClick={() => setIsImportOpen(true)}>最初の教材を取り込む</button></div>
+        <div className="jp-section-heading">
+          <div><p className="jp-eyebrow">LIBRARY</p><h2 id="jp-library-title">日本語教材</h2></div>
+          <span>{loading ? '…' : `${materials.length}件`}</span>
+        </div>
+        {loading ? (
+          <p className="jp-empty">教材を読み込んでいます…</p>
+        ) : materials.length === 0 ? (
+          <div className="jp-empty">
+            <strong>まだ日本語教材がありません</strong>
+            <p>AIで教材JSONを作るか、日本語本文をそのまま取り込めます。</p>
+            <button type="button" className="jp-button jp-button--primary" onClick={() => setIsImportOpen(true)}>
+              最初の教材を取り込む
+            </button>
+          </div>
         ) : (
           <div className="jp-material-grid">
             {materials.map(item => (
@@ -313,7 +408,14 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
                   <p>{item.content.sentences.length}文 ・ {item.content.analysisStatus === 'complete' ? '詳細解析あり' : '詳細解析なし'}</p>
                   <small>{new Date(item.updatedAt).toLocaleDateString('ja-JP')}</small>
                 </button>
-                <button type="button" className="jp-material-card__delete" aria-label={`${item.title}を削除`} onClick={() => setDeleteTarget(item)}>削除</button>
+                <button
+                  type="button"
+                  className="jp-material-card__delete"
+                  aria-label={`${item.title}を削除`}
+                  onClick={() => setDeleteTarget(item)}
+                >
+                  削除
+                </button>
               </article>
             ))}
           </div>
@@ -322,41 +424,173 @@ const JapaneseLibraryScreen: React.FC<JapaneseLibraryScreenProps> = ({ onBack, o
 
       {isImportOpen && (
         <div className="jp-modal-backdrop" onClick={closeImport}>
-          <section className="jp-import-modal" data-testid="jp-import-modal" role="dialog" aria-modal="true" aria-labelledby="jp-import-title" onClick={event => event.stopPropagation()}>
-            <header className="jp-import-modal__header"><div><p className="jp-eyebrow">IMPORT</p><h2 id="jp-import-title">日本語教材を取り込む</h2></div><button type="button" aria-label="取り込み画面を閉じる" disabled={isImporting} onClick={closeImport}>×</button></header>
+          <section
+            className="jp-import-modal"
+            data-testid="jp-import-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="jp-import-title"
+            onClick={event => event.stopPropagation()}
+          >
+            <header className="jp-import-modal__header">
+              <div><p className="jp-eyebrow">IMPORT</p><h2 id="jp-import-title">日本語教材を取り込む</h2></div>
+              <button type="button" aria-label="取り込み画面を閉じる" disabled={isImporting} onClick={closeImport}>×</button>
+            </header>
+
             <div className="jp-import-tabs" role="tablist" aria-label="取り込み方法">
               <button ref={firstTabRef} type="button" role="tab" aria-selected={importTab === 'json-paste'} onClick={() => selectTab('json-paste')}>JSONを貼る</button>
               <button type="button" role="tab" aria-selected={importTab === 'json-file'} onClick={() => selectTab('json-file')}>JSONファイル</button>
               <button type="button" role="tab" aria-selected={importTab === 'plain-text'} onClick={() => selectTab('plain-text')}>日本語本文</button>
             </div>
+
             <div className="jp-import-modal__body" data-testid="jp-import-body">
               {error && <pre className="jp-banner jp-banner--error" role="alert">{error}</pre>}
+
               {duplicate ? (
-                <div className="jp-duplicate-panel"><h3>同じ名前の教材があります</h3><p>「{duplicate.existing.title}」を上書きするか、コピーとして保存してください。</p><div><button type="button" className="jp-button jp-button--quiet" disabled={isImporting} onClick={() => setDuplicate(null)}>内容に戻る</button><button type="button" className="jp-button jp-button--secondary" disabled={isImporting} onClick={() => void handleDuplicateChoice('copy')}>コピーとして保存</button><button type="button" className="jp-button jp-button--primary" disabled={isImporting} onClick={() => void handleDuplicateChoice('replace')}>上書きする</button></div></div>
+                <div className="jp-duplicate-panel">
+                  <h3>同じ名前の教材があります</h3>
+                  <p>「{duplicate.existing.title}」を上書きするか、コピーとして保存してください。</p>
+                  <div>
+                    <button type="button" className="jp-button jp-button--quiet" disabled={isImporting} onClick={() => setDuplicate(null)}>内容に戻る</button>
+                    <button type="button" className="jp-button jp-button--secondary" disabled={isImporting} onClick={() => void handleDuplicateChoice('copy')}>コピーとして保存</button>
+                    <button type="button" className="jp-button jp-button--primary" disabled={isImporting} onClick={() => void handleDuplicateChoice('replace')}>上書きする</button>
+                  </div>
+                </div>
               ) : (
                 <>
-                  {importTab === 'json-paste' && <label className="jp-field"><span>日本語Reader教材JSON</span><textarea data-testid="jp-json-input" value={jsonInput} onChange={event => { setJsonInput(event.target.value); setPrepared(null); setError(''); }} rows={12} placeholder={'{\n  "schemaVersion": "memora-jp-reader-v1",\n  "mode": "jp-reader",\n  ...\n}'} /></label>}
-                  {importTab === 'json-file' && <div className="jp-file-picker"><input ref={fileInputRef} data-testid="jp-json-file" type="file" accept=".json,application/json,text/plain" onChange={handleJsonFile} /><button type="button" className="jp-button jp-button--secondary" onClick={() => fileInputRef.current?.click()}>JSONファイルを選ぶ</button><p>{jsonFileName || 'ファイルはまだ選ばれていません。'}</p>{jsonInput && <small>{jsonInput.length.toLocaleString('ja-JP')}文字を読み込みました。</small>}</div>}
+                  {importTab === 'json-paste' && (
+                    <label className="jp-field">
+                      <span>日本語Reader教材JSON</span>
+                      <textarea
+                        data-testid="jp-json-input"
+                        value={jsonInput}
+                        onChange={event => { setJsonInput(event.target.value); setPrepared(null); setError(''); }}
+                        rows={12}
+                        placeholder={'{\n  "schemaVersion": "memora-jp-reader-v1",\n  "mode": "jp-reader",\n  ...\n}'}
+                      />
+                    </label>
+                  )}
+
+                  {importTab === 'json-file' && (
+                    <div className="jp-file-picker">
+                      <input
+                        ref={fileInputRef}
+                        data-testid="jp-json-file"
+                        type="file"
+                        accept=".json,application/json,text/plain"
+                        onChange={handleJsonFile}
+                      />
+                      <button type="button" className="jp-button jp-button--secondary" onClick={() => fileInputRef.current?.click()}>
+                        JSONファイルを選ぶ
+                      </button>
+                      <p>{jsonFileName || 'ファイルはまだ選ばれていません。'}</p>
+                      {jsonInput && <small>{jsonInput.length.toLocaleString('ja-JP')}文字を読み込みました。</small>}
+                    </div>
+                  )}
+
                   {importTab === 'plain-text' && (
                     <div className="jp-import-form">
-                      <label className="jp-field"><span>日本語本文</span><textarea data-testid="jp-plain-input" value={plainText} onChange={event => setPlainText(event.target.value)} rows={9} placeholder="読みたい日本語の文章を貼り付けてください。" /></label>
-                      <label className="jp-field"><span>教材名 <small>（空欄なら本文から作成）</small></span><input value={plainTitle} onChange={event => setPlainTitle(event.target.value)} /></label>
-                      <div className="jp-import-form__row"><label className="jp-field"><span>学習レベル</span><select value={targetLevel} onChange={event => setTargetLevel(event.target.value as JpTargetLevel)}><option value="N4">N4</option><option value="N3">N3</option><option value="N2">N2</option></select></label><label className="jp-field"><span>権利状態</span><select value={rightsStatus} onChange={event => setRightsStatus(event.target.value as JpRightsStatus)}>{RIGHTS_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label></div>
-                      <label className="jp-field"><span>元のURL <small>（任意・自動取得はしません）</small></span><input type="url" value={sourceUrl} onChange={event => setSourceUrl(event.target.value)} placeholder="https://..." /></label>
-                      <div className="jp-analysis-callout"><strong>詳しく学びたい場合</strong><p>この本文をそのまま保ったまま、読み・辞書形・文法・英訳・やさしい日本語・クイズ付きJSONへ変換する指示を作れます。</p><button type="button" className="jp-button jp-button--secondary" data-testid="jp-analyze-plain-text" disabled={!plainText.trim()} onClick={() => void analyzePlainText()}>{analysisCopied ? '解析指示をコピーしました' : 'AI Studioでこの本文を解析'}</button></div>
+                      <label className="jp-field">
+                        <span>日本語本文</span>
+                        <textarea
+                          data-testid="jp-plain-input"
+                          value={plainText}
+                          onChange={event => setPlainText(event.target.value)}
+                          rows={9}
+                          placeholder="読みたい日本語の文章を貼り付けてください。"
+                        />
+                      </label>
+                      <label className="jp-field">
+                        <span>教材名 <small>（空欄なら本文から作成）</small></span>
+                        <input value={plainTitle} onChange={event => setPlainTitle(event.target.value)} />
+                      </label>
+                      <div className="jp-import-form__row">
+                        <label className="jp-field">
+                          <span>学習レベル</span>
+                          <select value={targetLevel} onChange={event => setTargetLevel(event.target.value as JpTargetLevel)}>
+                            <option value="N4">N4</option><option value="N3">N3</option><option value="N2">N2</option>
+                          </select>
+                        </label>
+                        <label className="jp-field">
+                          <span>権利状態</span>
+                          <select value={rightsStatus} onChange={event => setRightsStatus(event.target.value as JpRightsStatus)}>
+                            {RIGHTS_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
+                          </select>
+                        </label>
+                      </div>
+                      <label className="jp-field">
+                        <span>元のURL <small>（任意・自動取得はしません）</small></span>
+                        <input type="url" value={sourceUrl} onChange={event => setSourceUrl(event.target.value)} placeholder="https://..." />
+                      </label>
+                      <div className="jp-analysis-callout">
+                        <strong>詳しく学びたい場合</strong>
+                        <p>この本文をそのまま保ったまま、読み・辞書形・文法・英訳・やさしい日本語・クイズ付きJSONへ変換する指示を作れます。</p>
+                        <button
+                          type="button"
+                          className="jp-button jp-button--secondary"
+                          data-testid="jp-analyze-plain-text"
+                          disabled={!plainText.trim()}
+                          onClick={() => void analyzePlainText()}
+                        >
+                          {analysisCopied ? '解析指示をコピーしました' : 'AI Studioでこの本文を解析'}
+                        </button>
+                      </div>
                       <p className="jp-import-note">「教材として取り込む」だけなら本文はすぐ読めますが、詳細解析は付きません。</p>
                     </div>
                   )}
-                  {prepared && <div className="jp-import-preview" role="status"><strong>日本語教材JSONを確認できました</strong><p>{prepared.material.sentences.length}文・単語カード候補{prepared.material.vocabularyCards.length}件・クイズ{prepared.material.quiz.length}問</p>{prepared.repairs.length > 0 && <ul>{prepared.repairs.map(item => <li key={item}>{item}</li>)}</ul>}{prepared.warnings.length > 0 && <details><summary>警告 {prepared.warnings.length}件</summary><ul>{prepared.warnings.slice(0, 12).map((item, index) => <li key={`${index}-${item}`}>{item}</li>)}</ul></details>}</div>}
+
+                  {prepared && (
+                    <div className="jp-import-preview" role="status">
+                      <strong>日本語教材JSONを確認できました</strong>
+                      <p>{prepared.material.sentences.length}文・単語カード候補{prepared.material.vocabularyCards.length}件・クイズ{prepared.material.quiz.length}問</p>
+                      {prepared.repairs.length > 0 && <ul>{prepared.repairs.map(item => <li key={item}>{item}</li>)}</ul>}
+                      {prepared.warnings.length > 0 && (
+                        <details>
+                          <summary>警告 {prepared.warnings.length}件</summary>
+                          <ul>{prepared.warnings.slice(0, 12).map((item, index) => <li key={`${index}-${item}`}>{item}</li>)}</ul>
+                        </details>
+                      )}
+                    </div>
+                  )}
                 </>
               )}
             </div>
-            {!duplicate && <footer className="jp-import-modal__footer" data-testid="jp-import-footer"><button type="button" className="jp-button jp-button--primary" data-testid="jp-import-submit" disabled={isImporting || (importTab === 'plain-text' ? !plainText.trim() : !jsonInput.trim())} onClick={() => void handleImport()}>{isImporting ? '確認・保存中…' : importTab === 'plain-text' || prepared ? '教材として取り込む' : '内容を確認する'}</button></footer>}
+
+            {!duplicate && (
+              <footer className="jp-import-modal__footer" data-testid="jp-import-footer">
+                <button
+                  type="button"
+                  className="jp-button jp-button--primary"
+                  data-testid="jp-import-submit"
+                  disabled={isImporting || (importTab === 'plain-text' ? !plainText.trim() : !jsonInput.trim())}
+                  onClick={() => void handleImport()}
+                >
+                  {isImporting ? '確認・保存中…' : importTab === 'plain-text' || prepared ? '教材として取り込む' : '内容を確認する'}
+                </button>
+              </footer>
+            )}
           </section>
         </div>
       )}
 
-      {deleteTarget && <div className="jp-modal-backdrop" onClick={() => setDeleteTarget(null)}><section className="jp-confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="jp-delete-title" onClick={event => event.stopPropagation()}><h2 id="jp-delete-title">この教材を削除しますか？</h2><p>「{deleteTarget.title}」と、その教材の学習記録・登録単語・文法ノートを削除します。</p><div><button type="button" className="jp-button jp-button--quiet" onClick={() => setDeleteTarget(null)}>キャンセル</button><button type="button" className="jp-button jp-button--danger" onClick={() => void handleDelete()}>削除する</button></div></section></div>}
+      {deleteTarget && (
+        <div className="jp-modal-backdrop" onClick={() => setDeleteTarget(null)}>
+          <section
+            className="jp-confirm-modal"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="jp-delete-title"
+            onClick={event => event.stopPropagation()}
+          >
+            <h2 id="jp-delete-title">この教材を削除しますか？</h2>
+            <p>「{deleteTarget.title}」と、その教材の学習記録・登録単語・文法ノートを削除します。</p>
+            <div>
+              <button type="button" className="jp-button jp-button--quiet" onClick={() => setDeleteTarget(null)}>キャンセル</button>
+              <button type="button" className="jp-button jp-button--danger" onClick={() => void handleDelete()}>削除する</button>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   );
 };
