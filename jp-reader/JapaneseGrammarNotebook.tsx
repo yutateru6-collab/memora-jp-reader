@@ -7,10 +7,18 @@ interface Props { onBack: () => void; onChanged?: () => void; }
 const JapaneseGrammarNotebook: React.FC<Props> = ({ onBack, onChanged }) => {
   const [notes, setNotes] = useState<JpGrammarNote[]>([]);
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    try { setNotes(await getAllJpGrammarNotes()); }
-    catch (error) { setMessage(error instanceof Error ? error.message : '文法ノートを読み込めませんでした。'); }
+    setLoading(true);
+    try {
+      setNotes(await getAllJpGrammarNotes());
+      setMessage('');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : '文法ノートを読み込めませんでした。');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { void load(); }, [load]);
@@ -28,7 +36,7 @@ const JapaneseGrammarNotebook: React.FC<Props> = ({ onBack, onChanged }) => {
         <div><p className="jp-eyebrow">GRAMMAR NOTEBOOK</p><h2>文法ノート</h2><p>読んでいる途中で残した文法を、教材をまたいで見返せます。</p></div>
       </header>
       {message && <p className="jp-reader-message">{message}</p>}
-      {notes.length === 0 ? <div className="jp-empty"><strong>保存した文法はまだありません</strong><p>Readerの文解説から「文法ノートに保存」を押してください。</p></div> : (
+      {loading ? <div className="jp-empty" role="status"><strong>文法ノートを読み込んでいます…</strong></div> : notes.length === 0 ? <div className="jp-empty"><strong>保存した文法はまだありません</strong><p>Readerの文解説から「文法ノートに保存」を押してください。</p></div> : (
         <div className="jp-note-list">
           {notes.map(note => (
             <article key={note.storageKey} className="jp-note-card">
