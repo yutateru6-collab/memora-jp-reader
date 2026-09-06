@@ -16,6 +16,15 @@
   box-shadow: 0 8px 24px rgba(2, 6, 23, 0.2);
 }
 
+.jp-learning-dashboard--loading .jp-learning-dashboard__loading {
+  grid-column: 1 / -1;
+  min-height: 58px;
+  display: grid;
+  place-items: center;
+  color: #b9c2d8;
+  font-size: 12px;
+}
+
 .jp-learning-dashboard strong {
   display: block;
   color: #fff;
@@ -50,6 +59,11 @@
   background: linear-gradient(145deg, rgba(37, 43, 97, 0.94), rgba(15, 34, 74, 0.92));
   color: #eef2ff;
   text-align: left;
+}
+
+.jp-learning-actions button:disabled {
+  opacity: 0.58;
+  cursor: progress;
 }
 
 .jp-learning-actions button span {
@@ -222,6 +236,7 @@
     gap: 5px;
   }
   .jp-learning-dashboard > div { padding: 10px 3px; border-radius: 13px; }
+  .jp-learning-dashboard--loading .jp-learning-dashboard__loading { min-height: 52px; padding: 10px; }
   .jp-learning-dashboard strong { font-size: 17px; }
   .jp-learning-dashboard span { font-size: 8px; }
   .jp-learning-actions { grid-template-columns: 1fr; }
