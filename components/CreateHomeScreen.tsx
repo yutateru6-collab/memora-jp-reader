@@ -1,11 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import type { PromptPersonaSelection } from './PromptLibraryScreen';
-import {
-  buildReadingPrompt,
-  getReaderCompatibleRole,
-  KNOWLEDGE_DEPTH_OPTIONS,
-  type KnowledgeDepth,
-} from '../lib/readingPrompt';
+import { KNOWLEDGE_DEPTH_OPTIONS, type KnowledgeDepth } from '../lib/readingPrompt';
+import { buildJapaneseReadingPrompt } from '../lib/japaneseReadingPrompt';
+import type { JpTargetLevel } from '../jp-reader/types';
 import '../create-home.css';
 import '../create-depth.css';
 
@@ -18,19 +15,16 @@ interface CreateHomeScreenProps {
 
 const AI_STUDIO_URL = 'https://aistudio.google.com/app/u/0/prompts/new_chat?model=gemini-3-pro-preview';
 
-const levelOptions = {
-  '日本の「英検1級」レベル': '英検1級',
-  '日本の「英検準1級」レベル': '英検準1級',
-  '日本の「英検2級」レベル': '英検2級',
-  '日本の「英検準2級」レベル': '英検準2級',
-  '日本の「英検3級」レベル': '英検3級',
-  '日本の「大学入学共通テスト英語」で高得点を狙えるレベル': '共通テスト',
+const levelOptions: Record<JpTargetLevel, string> = {
+  N4: 'N4｜基礎から多読へ',
+  N3: 'N3｜自然な長文へ',
+  N2: 'N2｜生の日本語へ',
 };
 
 const lengthOptions = {
-  '200': '約200語',
-  '400': '約400語',
-  '600': '約600語',
+  '700': '短め｜約700字',
+  '1200': '標準｜約1,200字',
+  '1800': '長め｜約1,800字',
 };
 
 const roleOptions = [
@@ -100,14 +94,12 @@ const WandIcon = () => (
 const CreateHomeScreen: React.FC<CreateHomeScreenProps> = ({
   onOpenLibrary,
   onOpenJapaneseReader,
-  onOpenOtherModes,
-  onNavigateToPasteJSON,
 }) => {
   const [topic, setTopic] = useState('');
   const [exampleKeyword, setExampleKeyword] = useState('');
-  const [level, setLevel] = useState('日本の「英検準1級」レベル');
+  const [level, setLevel] = useState<JpTargetLevel>('N3');
   const [knowledgeDepth, setKnowledgeDepth] = useState<KnowledgeDepth>('familiar');
-  const [length, setLength] = useState('400');
+  const [length, setLength] = useState('1200');
   const [role, setRole] = useState('やさしく導く先生');
   const [trait, setTrait] = useState('やさしくて、まなびを楽しませてくれる！');
   const [copied, setCopied] = useState(false);
@@ -119,7 +111,7 @@ const CreateHomeScreen: React.FC<CreateHomeScreenProps> = ({
 
   const generatePrompt = useCallback(() => {
     const usePersonalSettings = localStorage.getItem('use_personal_settings') !== 'false';
-    return buildReadingPrompt({
+    return buildJapaneseReadingPrompt({
       topic,
       additionalRequest: exampleKeyword,
       level,
@@ -156,10 +148,14 @@ const CreateHomeScreen: React.FC<CreateHomeScreenProps> = ({
     window.open(AI_STUDIO_URL, '_blank', 'noopener,noreferrer');
   }, [copyPrompt]);
 
-  const selectedPersona: PromptPersonaSelection = useMemo(
-    () => ({ name: '', role: getReaderCompatibleRole(role), trait }),
-    [role, trait],
-  );
+  const handleOpenJapaneseImport = useCallback(() => {
+    try {
+      sessionStorage.setItem('memora-jp-open-import', '1');
+    } catch {
+      // sessionStorageが使えない場合でもライブラリまでは開く。
+    }
+    onOpenJapaneseReader();
+  }, [onOpenJapaneseReader]);
 
   return (
     <main className="create-home" data-testid="create-home">
@@ -177,23 +173,23 @@ const CreateHomeScreen: React.FC<CreateHomeScreenProps> = ({
             decoding="async"
           />
 
-          <button type="button" className="create-home__library-button" onClick={onOpenLibrary}>
+          <button type="button" className="create-home__library-button" onClick={onOpenJapaneseReader} data-testid="open-japanese-reader">
             <BookIcon />
-            <span>教材一覧</span>
+            <span>日本語教材</span>
           </button>
 
           <div className="create-home__hero-copy">
             <div className="create-home__brand-lockup">
-              <h1 id="create-home-title" aria-label="リードン READON">
-                <span className="create-home__brand-reading">リードン</span>
-                <span className="create-home__brand-name">READON</span>
+              <h1 id="create-home-title" aria-label="リードン 日本語 READON JP">
+                <span className="create-home__brand-reading">リードン 日本語</span>
+                <span className="create-home__brand-name">READON JP</span>
               </h1>
-              <p className="create-home__brand-tagline">好きからつくる、英語長文。</p>
+              <p className="create-home__brand-tagline">好きからつくる、日本語長文。</p>
             </div>
             <p className="create-home__hero-description">
               <span>好きなテーマで</span>
               <span>自分だけの</span>
-              <span><strong>英語教材</strong>を作ろう！</span>
+              <span><strong>日本語教材</strong>を作ろう！</span>
             </p>
           </div>
         </section>
@@ -202,17 +198,17 @@ const CreateHomeScreen: React.FC<CreateHomeScreenProps> = ({
           type="button"
           className="create-home__japanese-button"
           onClick={onOpenJapaneseReader}
-          data-testid="open-japanese-reader"
+          data-testid="jp-mode-banner"
         >
           <span className="create-home__japanese-mark" aria-hidden="true">あ</span>
           <span>
             <strong>日本語 Reader Mode</strong>
-            <small>好きな日本語を、今の自分に読める日本語へ。</small>
+            <small>N4〜N2向け。原文・やさしい日本語・語彙・文法を一緒に学べます。</small>
           </span>
           <span className="create-home__japanese-chevron" aria-hidden="true">›</span>
         </button>
 
-        <section className="create-home__glass-card create-home__topic-card" aria-label="長文の内容">
+        <section className="create-home__glass-card create-home__topic-card" aria-label="日本語長文の内容">
           <label className="create-home__field">
             <span className="create-home__field-label"><span aria-hidden="true">★</span> テーマ</span>
             <input
@@ -228,24 +224,24 @@ const CreateHomeScreen: React.FC<CreateHomeScreenProps> = ({
             <input
               value={exampleKeyword}
               onChange={(event) => setExampleKeyword(event.target.value)}
-              placeholder="内容・使いたい単語・伝えたいポイントなど"
+              placeholder="内容・使いたい日本語表現・伝えたいポイントなど"
               data-testid="create-keyword"
             />
           </label>
         </section>
 
-        <section className="create-home__choice-grid" aria-label="教材の英語レベル、テーマへの詳しさ、長さ">
+        <section className="create-home__choice-grid" aria-label="教材の日本語レベル、テーマへの詳しさ、長さ">
           <label className="create-home__glass-card create-home__choice-card create-home__choice-card--level">
-            <span className="create-home__choice-title"><span aria-hidden="true">✦</span> 英語レベル</span>
+            <span className="create-home__choice-title"><span aria-hidden="true">✦</span> 日本語レベル</span>
             <div className="create-home__select-wrap">
               <BookIcon />
-              <select value={level} onChange={(event) => setLevel(event.target.value)} data-testid="create-level">
+              <select value={level} onChange={(event) => setLevel(event.target.value as JpTargetLevel)} data-testid="create-level">
                 {Object.entries(levelOptions).map(([value, label]) => (
                   <option key={value} value={value}>{label}</option>
                 ))}
               </select>
             </div>
-            <small>長文の難易度を選びます</small>
+            <small>JLPTを目安に長文の難易度を選びます</small>
           </label>
 
           <label className="create-home__glass-card create-home__choice-card create-home__choice-card--knowledge">
@@ -275,7 +271,7 @@ const CreateHomeScreen: React.FC<CreateHomeScreenProps> = ({
                 ))}
               </select>
             </div>
-            <small>おおよその単語数を選びます</small>
+            <small>おおよその日本語文字数を選びます</small>
           </label>
         </section>
 
@@ -308,27 +304,27 @@ const CreateHomeScreen: React.FC<CreateHomeScreenProps> = ({
           </div>
         </section>
 
-        <section className="create-home__actions" aria-label="教材作成アクション">
+        <section className="create-home__actions" aria-label="日本語教材作成アクション">
           <button type="button" className="create-home__action create-home__action--primary" onClick={handleOpenAiStudio} data-testid="create-open-ai-studio">
             <span className="create-home__action-icon"><WandIcon /></span>
-            <span className="create-home__action-copy"><strong>AI Studioで教材をつくる</strong><small>作成用の指示をコピーしてAI Studioを開きます</small></span>
+            <span className="create-home__action-copy"><strong>AI Studioで日本語教材をつくる</strong><small>日本語長文と学習情報を作る指示をコピーして開きます</small></span>
             <span className="create-home__chevron" aria-hidden="true">›</span>
           </button>
 
           <button
             type="button"
             className="create-home__action create-home__action--import"
-            onClick={() => onNavigateToPasteJSON([selectedPersona])}
+            onClick={handleOpenJapaneseImport}
             data-testid="create-import"
           >
             <span className="create-home__action-icon"><ImportIcon /></span>
-            <span className="create-home__action-copy"><strong>できた教材を取り込む</strong><small>AI Studioで作った結果を貼り付けます</small></span>
+            <span className="create-home__action-copy"><strong>できた日本語教材を取り込む</strong><small>AI Studioで作った日本語Reader JSONを貼り付けます</small></span>
             <span className="create-home__chevron" aria-hidden="true">›</span>
           </button>
 
           <button type="button" className="create-home__action create-home__action--copy" onClick={copyPrompt} data-testid="create-copy">
             <span className="create-home__action-icon"><ClipboardIcon /></span>
-            <span className="create-home__action-copy"><strong>{copied ? 'コピーしました！' : '作成用の指示だけコピー'}</strong><small>AI Studioへ貼り付ける内容をコピーします</small></span>
+            <span className="create-home__action-copy"><strong>{copied ? 'コピーしました！' : '日本語教材の作成指示をコピー'}</strong><small>別のAIへ貼り付けても同じJSON形式で作れます</small></span>
             <span className="create-home__chevron" aria-hidden="true">›</span>
           </button>
         </section>
@@ -337,16 +333,16 @@ const CreateHomeScreen: React.FC<CreateHomeScreenProps> = ({
           <img className="create-home__footer-flowers" src="/create-home/footer-flowers.webp" alt="" aria-hidden="true" draggable={false} loading="lazy" decoding="async" />
           <div className="create-home__footer-note">
             <span aria-hidden="true">♢</span>
-            <span>{personalSettingsEnabled ? 'あなたのパーソナル設定は長文に反映されます' : 'パーソナル設定は現在オフです'}</span>
+            <span>{personalSettingsEnabled ? 'あなたのパーソナル設定は日本語長文の題材に反映されます' : 'パーソナル設定は現在オフです'}</span>
           </div>
 
           <button
             type="button"
             className="create-home__other-modes"
-            onClick={onOpenOtherModes}
-            aria-label="匿名掲示板など、その他の教材をつくる"
+            onClick={onOpenLibrary}
+            aria-label="英語版MEMORAの教材一覧を開く"
           >
-            その他の教材
+            英語版MEMORA
           </button>
         </footer>
       </div>
