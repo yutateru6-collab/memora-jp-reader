@@ -7,10 +7,18 @@ interface Props { onBack: () => void; onChanged?: () => void; }
 const JapaneseKnownWords: React.FC<Props> = ({ onBack, onChanged }) => {
   const [items, setItems] = useState<JpKnownLexeme[]>([]);
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    try { setItems(await getAllKnownJpLexemes()); }
-    catch (error) { setMessage(error instanceof Error ? error.message : '既知語を読み込めませんでした。'); }
+    setLoading(true);
+    try {
+      setItems(await getAllKnownJpLexemes());
+      setMessage('');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : '既知語を読み込めませんでした。');
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { void load(); }, [load]);
@@ -28,7 +36,7 @@ const JapaneseKnownWords: React.FC<Props> = ({ onBack, onChanged }) => {
         <div><p className="jp-eyebrow">KNOWN WORDS</p><h2>知っている語</h2><p>ここに入った語は「知らない語だけ」ふりがなモードで補助を減らします。</p></div>
       </header>
       {message && <p className="jp-reader-message">{message}</p>}
-      {items.length === 0 ? <div className="jp-empty"><strong>既知語はまだありません</strong><p>Readerの語彙情報から「知っている」にできます。</p></div> : (
+      {loading ? <div className="jp-empty" role="status"><strong>既知語を読み込んでいます…</strong></div> : items.length === 0 ? <div className="jp-empty"><strong>既知語はまだありません</strong><p>Readerの語彙情報から「知っている」にできます。</p></div> : (
         <div className="jp-known-grid">
           {items.map(item => (
             <article key={item.key} className="jp-known-card">
