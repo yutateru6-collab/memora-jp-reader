@@ -54,6 +54,11 @@ for (const target of targets) {
 
     await page.getByRole('button', { name: '← 教材一覧' }).click();
     await page.getByTestId('jp-learning-dashboard').waitFor({ state: 'visible', timeout: 10_000 });
+    await page.waitForFunction(() => {
+      const element = document.querySelector('[data-testid="jp-learning-dashboard"]');
+      const text = element?.textContent?.replace(/\s+/g, ' ') || '';
+      return /1\s*登録語/.test(text) && /1\s*既知語/.test(text) && /1\s*文法/.test(text);
+    }, null, { timeout: 10_000 });
     const dashboard = await page.getByTestId('jp-learning-dashboard').innerText();
     if (!/1\s*登録語/.test(dashboard.replace(/\n/g, ' '))) throw new Error(`${target.name}: registered word summary missing: ${dashboard}`);
     if (!/1\s*既知語/.test(dashboard.replace(/\n/g, ' '))) throw new Error(`${target.name}: known word summary missing: ${dashboard}`);
