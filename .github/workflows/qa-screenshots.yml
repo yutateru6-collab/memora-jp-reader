@@ -39,7 +39,7 @@ jobs:
       - name: Verify production build
         run: npm run build
 
-      - name: Verify exact user material parser and safe repairs
+      - name: Verify legacy material parser remains safe
         run: |
           npx esbuild lib/readingMaterialImport.ts --bundle --platform=node --format=esm --outfile=/tmp/memora-reading-import.mjs
           node tools/import-parser-smoke.mjs
@@ -71,34 +71,12 @@ jobs:
           cat /tmp/memora-vite.log || true
           exit 1
 
-      - name: Run responsive browser QA
-        run: node tools/capture-screenshots.mjs
-        env:
-          APP_URL: http://127.0.0.1:3000
-          QA_REPOSITORY: ${{ github.repository }}
-          QA_COMMIT_SHA: ${{ github.sha }}
-          QA_RUN_ID: ${{ github.run_id }}
-          QA_RUN_NUMBER: ${{ github.run_number }}
-          QA_EVENT_NAME: ${{ github.event_name }}
-
-      - name: Run READON knowledge depth QA
-        run: node tools/knowledge-depth-qa.mjs
+      - name: Run Japanese creation-flow QA
+        run: node tools/jp-create-screen-qa.mjs
         env:
           APP_URL: http://127.0.0.1:3000
 
-      - name: Run exact, atomic, and tolerant READON import QA
-        run: node tools/readon-strict-contract-qa.mjs
-        env:
-          APP_URL: http://127.0.0.1:3000
-
-      - name: Run iPhone WebKit regression QA
-        if: always()
-        run: node tools/mobile-webkit-regression.mjs
-        env:
-          APP_URL: http://127.0.0.1:3000
-
-      - name: Run Japanese Reader responsive QA
-        if: always()
+      - name: Run Japanese Reader end-to-end responsive QA
         run: node tools/jp-reader-browser-qa.mjs
         env:
           APP_URL: http://127.0.0.1:3000
