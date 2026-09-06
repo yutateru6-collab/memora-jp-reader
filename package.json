@@ -1,0 +1,24 @@
+{
+  "name": "memora-jp-reader",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 3000",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "qa:jp-import": "esbuild jp-reader/import.ts --bundle --platform=node --format=esm --outfile=/tmp/memora-jp-import.mjs && node tools/jp-reader-import-smoke.mjs",
+    "qa:jp-db": "esbuild jp-reader/import.ts --bundle --platform=node --format=esm --outfile=/tmp/memora-jp-import.mjs && esbuild jp-reader/db.ts --bundle --platform=node --format=esm --outfile=/tmp/memora-jp-db.mjs && node tools/jp-reader-db-smoke.mjs"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "fake-indexeddb": "^6.2.5",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}
