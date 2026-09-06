@@ -68,12 +68,12 @@ for (const target of targets) {
 
     await page.getByTestId('jp-open-grammar').click();
     await page.getByTestId('jp-grammar-notebook').waitFor({ state: 'visible', timeout: 10_000 });
-    if (!/名詞＋を＋動詞/.test(await page.locator('body').innerText())) throw new Error(`${target.name}: saved grammar missing`);
+    await page.getByText('名詞＋を＋動詞', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 });
     await page.getByRole('button', { name: '← 教材一覧' }).click();
 
     await page.getByTestId('jp-open-known').click();
     await page.getByTestId('jp-known-words').waitFor({ state: 'visible', timeout: 10_000 });
-    if (!/勉強し/.test(await page.locator('body').innerText())) throw new Error(`${target.name}: known word missing`);
+    await page.getByText('勉強し', { exact: true }).waitFor({ state: 'visible', timeout: 10_000 });
 
     if (consoleErrors.length) throw new Error(`${target.name}: console errors: ${consoleErrors.join(' | ')}`);
     if (pageErrors.length) throw new Error(`${target.name}: page errors: ${pageErrors.join(' | ')}`);
