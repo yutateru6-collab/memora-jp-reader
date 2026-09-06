@@ -1,5 +1,8 @@
+import type { SRSState } from '../types';
 import type {
   JapaneseReaderMaterialV1,
+  JpGrammarNote,
+  JpKnownLexeme,
   JpReaderProgress,
   JpTextVariant,
   JpVocabularyCardSeed,
@@ -8,10 +11,12 @@ import type {
 } from './types';
 
 const DB_NAME = 'MemoraJapaneseReaderDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const MATERIAL_STORE = 'materials';
 const PROGRESS_STORE = 'progress';
 const CARD_STORE = 'cards';
+const KNOWN_STORE = 'knownLexemes';
+const GRAMMAR_STORE = 'grammarNotes';
 const JAPANESE_SCRIPT_RE = /[ぁ-んァ-ヶ一-龯々〆ヵヶ]/u;
 
 let databasePromise: Promise<IDBDatabase> | null = null;
@@ -44,6 +49,15 @@ const openDatabase = () => {
       if (!db.objectStoreNames.contains(CARD_STORE)) {
         const store = db.createObjectStore(CARD_STORE, { keyPath: 'storageKey' });
         store.createIndex('materialId', 'materialId', { unique: false });
+      }
+      if (!db.objectStoreNames.contains(KNOWN_STORE)) {
+        const store = db.createObjectStore(KNOWN_STORE, { keyPath: 'key' });
+        store.createIndex('addedAt', 'addedAt', { unique: false });
+      }
+      if (!db.objectStoreNames.contains(GRAMMAR_STORE)) {
+        const store = db.createObjectStore(GRAMMAR_STORE, { keyPath: 'storageKey' });
+        store.createIndex('materialId', 'materialId', { unique: false });
+        store.createIndex('createdAt', 'createdAt', { unique: false });
       }
     };
     request.onsuccess = () => {
@@ -124,10 +138,10 @@ export const saveJpMaterial = async (
   assertJapaneseReaderContent(content);
   const db = await openDatabase();
   const now = new Date().toISOString();
-  const transaction = db.transaction(
-    options.replaceId !== undefined ? [MATERIAL_STORE, PROGRESS_STORE, CARD_STORE] : MATERIAL_STORE,
-    'readwrite',
-  );
+  const stores = options.replaceId !== undefined
+    ? [MATERIAL_STORE, PROGRESS_STORE, CARD_STORE, GRAMMAR_STORE]
+    : [MATERIAL_STORE];
+  const transaction = db.transaction(stores, 'readwrite');
   const completion = transactionToPromise(transaction);
   const store = transaction.objectStore(MATERIAL_STORE);
 
@@ -157,27 +171,31 @@ export const saveJpMaterial = async (
       const cardStore = transaction.objectStore(CARD_STORE);
       const cardKeys = await requestToPromise(cardStore.index('materialId').getAllKeys(id));
       cardKeys.forEach(key => cardStore.delete(key));
+      const grammarStore = transaction.objectStore(GRAMMAR_STORE);
+      const grammarKeys = await requestToPromise(grammarStore.index('materialId').getAllKeys(id));
+      grammarKeys.forEach(key => grammarStore.delete(key));
     }
     await completion;
     return { ...recordWithoutId, id };
   } catch (error) {
-    try { transaction.abort(); } catch { /* The transaction may already be closed. */ }
-    try { await completion; } catch { /* Consume the expected abort rejection. */ }
+    try { transaction.abort(); } catch { /* transaction may already be closed */ }
+    try { await completion; } catch { /* consume expected abort */ }
     throw formatJpStorageError(error);
   }
 };
 
 export const deleteJpMaterial = async (id: number) => {
   const db = await openDatabase();
-  const transaction = db.transaction([MATERIAL_STORE, PROGRESS_STORE, CARD_STORE], 'readwrite');
+  const transaction = db.transaction([MATERIAL_STORE, PROGRESS_STORE, CARD_STORE, GRAMMAR_STORE], 'readwrite');
   const completion = transactionToPromise(transaction);
-  const materialStore = transaction.objectStore(MATERIAL_STORE);
-  const progressStore = transaction.objectStore(PROGRESS_STORE);
+  transaction.objectStore(MATERIAL_STORE).delete(id);
+  transaction.objectStore(PROGRESS_STORE).delete(id);
   const cardStore = transaction.objectStore(CARD_STORE);
-  materialStore.delete(id);
-  progressStore.delete(id);
   const cardKeys = await requestToPromise(cardStore.index('materialId').getAllKeys(id));
   cardKeys.forEach(key => cardStore.delete(key));
+  const grammarStore = transaction.objectStore(GRAMMAR_STORE);
+  const grammarKeys = await requestToPromise(grammarStore.index('materialId').getAllKeys(id));
+  grammarKeys.forEach(key => grammarStore.delete(key));
   await completion;
 };
 
@@ -188,6 +206,15 @@ export const getJpProgress = async (materialId: number): Promise<JpReaderProgres
   const record = await requestToPromise(transaction.objectStore(PROGRESS_STORE).get(materialId)) as JpReaderProgress | undefined;
   await completion;
   return record || null;
+};
+
+export const getAllJpProgress = async (): Promise<JpReaderProgress[]> => {
+  const db = await openDatabase();
+  const transaction = db.transaction(PROGRESS_STORE, 'readonly');
+  const completion = transactionToPromise(transaction);
+  const records = await requestToPromise(transaction.objectStore(PROGRESS_STORE).getAll()) as JpReaderProgress[];
+  await completion;
+  return records;
 };
 
 export const saveJpProgress = async (progress: JpReaderProgress) => {
@@ -218,6 +245,20 @@ export const getJpCardsForMaterial = async (materialId: number): Promise<StoredJ
   return cards;
 };
 
+export const getAllJpCards = async (): Promise<StoredJpVocabularyCard[]> => {
+  const db = await openDatabase();
+  const transaction = db.transaction(CARD_STORE, 'readonly');
+  const completion = transactionToPromise(transaction);
+  const cards = await requestToPromise(transaction.objectStore(CARD_STORE).getAll()) as StoredJpVocabularyCard[];
+  await completion;
+  return cards.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+};
+
+export const getDueJpCards = async (now = Date.now()): Promise<StoredJpVocabularyCard[]> => {
+  const cards = await getAllJpCards();
+  return cards.filter(card => !card.srsState || card.srsState.dueDate <= now);
+};
+
 export const registerJpVocabularyCard = async (
   materialId: number,
   seed: JpVocabularyCardSeed,
@@ -243,6 +284,17 @@ export const registerJpVocabularyCard = async (
   return card;
 };
 
+export const updateJpCardSrs = async (storageKey: string, srsState: SRSState) => {
+  const db = await openDatabase();
+  const transaction = db.transaction(CARD_STORE, 'readwrite');
+  const completion = transactionToPromise(transaction);
+  const store = transaction.objectStore(CARD_STORE);
+  const current = await requestToPromise(store.get(storageKey)) as StoredJpVocabularyCard | undefined;
+  if (!current) throw new Error('復習する単語カードが見つかりませんでした。');
+  store.put({ ...current, srsState });
+  await completion;
+};
+
 export const unregisterJpVocabularyCard = async (storageKey: string) => {
   const db = await openDatabase();
   const transaction = db.transaction(CARD_STORE, 'readwrite');
@@ -253,4 +305,63 @@ export const unregisterJpVocabularyCard = async (storageKey: string) => {
   } catch (error) {
     throw formatJpStorageError(error);
   }
+};
+
+export const getAllKnownJpLexemes = async (): Promise<JpKnownLexeme[]> => {
+  const db = await openDatabase();
+  const transaction = db.transaction(KNOWN_STORE, 'readonly');
+  const completion = transactionToPromise(transaction);
+  const records = await requestToPromise(transaction.objectStore(KNOWN_STORE).getAll()) as JpKnownLexeme[];
+  await completion;
+  return records.sort((a, b) => b.addedAt.localeCompare(a.addedAt));
+};
+
+export const saveKnownJpLexeme = async (record: JpKnownLexeme) => {
+  const db = await openDatabase();
+  const transaction = db.transaction(KNOWN_STORE, 'readwrite');
+  const completion = transactionToPromise(transaction);
+  transaction.objectStore(KNOWN_STORE).put(record);
+  await completion;
+};
+
+export const deleteKnownJpLexeme = async (key: string) => {
+  const db = await openDatabase();
+  const transaction = db.transaction(KNOWN_STORE, 'readwrite');
+  const completion = transactionToPromise(transaction);
+  transaction.objectStore(KNOWN_STORE).delete(key);
+  await completion;
+};
+
+export const getAllJpGrammarNotes = async (): Promise<JpGrammarNote[]> => {
+  const db = await openDatabase();
+  const transaction = db.transaction(GRAMMAR_STORE, 'readonly');
+  const completion = transactionToPromise(transaction);
+  const records = await requestToPromise(transaction.objectStore(GRAMMAR_STORE).getAll()) as JpGrammarNote[];
+  await completion;
+  return records.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+};
+
+export const getJpGrammarNotesForMaterial = async (materialId: number): Promise<JpGrammarNote[]> => {
+  const db = await openDatabase();
+  const transaction = db.transaction(GRAMMAR_STORE, 'readonly');
+  const completion = transactionToPromise(transaction);
+  const records = await requestToPromise(transaction.objectStore(GRAMMAR_STORE).index('materialId').getAll(materialId)) as JpGrammarNote[];
+  await completion;
+  return records;
+};
+
+export const saveJpGrammarNote = async (note: JpGrammarNote) => {
+  const db = await openDatabase();
+  const transaction = db.transaction(GRAMMAR_STORE, 'readwrite');
+  const completion = transactionToPromise(transaction);
+  transaction.objectStore(GRAMMAR_STORE).put(note);
+  await completion;
+};
+
+export const deleteJpGrammarNote = async (storageKey: string) => {
+  const db = await openDatabase();
+  const transaction = db.transaction(GRAMMAR_STORE, 'readwrite');
+  const completion = transactionToPromise(transaction);
+  transaction.objectStore(GRAMMAR_STORE).delete(storageKey);
+  await completion;
 };
