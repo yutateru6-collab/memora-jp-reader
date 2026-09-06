@@ -81,6 +81,11 @@ jobs:
         env:
           APP_URL: http://127.0.0.1:3000
 
+      - name: Audit Japanese learner experience gaps
+        run: node tools/jp-learner-gap-audit.mjs
+        env:
+          APP_URL: http://127.0.0.1:3000
+
       - name: Retain QA evidence briefly
         if: always()
         uses: actions/upload-artifact@v4
