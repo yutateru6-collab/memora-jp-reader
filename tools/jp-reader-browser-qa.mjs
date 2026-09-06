@@ -14,7 +14,7 @@ const targets = [
 
 const getJpMaterialCount = page => page.evaluate(async () => {
   const database = await new Promise((resolve, reject) => {
-    const request = indexedDB.open('MemoraJapaneseReaderDB', 1);
+    const request = indexedDB.open('MemoraJapaneseReaderDB');
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
@@ -57,7 +57,7 @@ for (const target of targets) {
   try {
     await page.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 60_000 });
     await page.getByTestId('create-home').waitFor({ state: 'visible', timeout: 20_000 });
-    if (!(await page.getByTestId('create-topic').isVisible())) throw new Error(`${target.name}: English create flow is missing.`);
+    if (!(await page.getByTestId('create-topic').isVisible())) throw new Error(`${target.name}: Japanese create flow is missing.`);
 
     const dialog = await openJapaneseImport(page);
     const modalLayout = await page.evaluate(() => {
